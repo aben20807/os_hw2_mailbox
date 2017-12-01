@@ -52,12 +52,35 @@ int main(int argc, char **argv)
 		char *full_path = NULL;
 		CALLOC(full_path, 255, sizeof(char));
 		realpath(filename, full_path);
-		printf("%s\n", filename);
+		printf("%d\n", (entry->d_type == DT_DIR));
+		// printf("%s\n", filename);
 		printf("%s\n", full_path);
 	}
 	closedir(dir);
 
+	listdir(directory, 0);
 	printf("\nmaster finished\n\n");
+}
+
+void listdir(const char *name, int layer)
+{
+	DIR *dir;
+	struct dirent *entry;
+	if (!(dir = opendir(name)))
+		return;
+	while ((entry = readdir(dir)) != NULL) {
+		if (entry->d_type == DT_DIR) {
+			char path[1024];
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
+			printf("%*s[%s]\n", layer, "", entry->d_name);
+			listdir(path, layer + 2);
+		} else {
+			printf("%*s- %s\n", layer, "", entry->d_name);
+		}
+	}
+	closedir(dir);
 }
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)

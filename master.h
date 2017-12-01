@@ -7,7 +7,11 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <string.h>
 
+#define _GNU_SOURCE
+# define DT_DIR 4 // a directory
+# define DT_REG 8 // a regular file
 #define ERRMSG_SIZE 30
 
 #define MALLOC(p, s) \
@@ -23,5 +27,8 @@
 #define FREE(p) \
     free(p); \
     p = NULL; \
+
+
+void listdir(const char *name, int indent);
 
 #endif
