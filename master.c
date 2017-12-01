@@ -33,6 +33,30 @@ int main(int argc, char **argv)
 	printf("query_word: %s\n", query_word);
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
+
+	DIR *dir = opendir(directory);
+	if (dir == NULL) {
+		char *err_msg = NULL;
+		CALLOC(err_msg, ERRMSG_SIZE, sizeof(char));
+		sprintf(err_msg, "opendir(%s)", directory);
+		perror(err_msg);
+		FREE(err_msg);
+		// return NULL;
+		exit(1);
+	}
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL) {
+		char *filename = NULL;
+		CALLOC(filename, 255, sizeof(char));
+		filename = entry->d_name;
+		char *full_path = NULL;
+		CALLOC(full_path, 255, sizeof(char));
+		realpath(filename, full_path);
+		printf("%s\n", filename);
+		printf("%s\n", full_path);
+	}
+	closedir(dir);
+
 	printf("\nmaster finished\n\n");
 }
 
