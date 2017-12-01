@@ -10,23 +10,25 @@
 #include <string.h>
 
 #define _GNU_SOURCE
-# define DT_DIR 4 // a directory
-# define DT_REG 8 // a regular file
 #define ERRMSG_SIZE 30
 
+typedef struct mail_t *mail_ptr;
+typedef mail_ptr Queue;
+Queue fullname_queue;
+
 #define MALLOC(p, s) \
-    if(!((p) = malloc(s))){ \
-        fprintf(stderr, "insufficient memory"); \
-        exit(EXIT_FAILURE); \
-    }
+	if(!((p) = malloc(s))){ \
+		fprintf(stderr, "insufficient memory"); \
+		exit(EXIT_FAILURE); \
+	}
 #define CALLOC(p, l, s) \
-    if(!((p) = calloc(l, s))){ \
-        fprintf(stderr, "insufficient memory"); \
-        exit(EXIT_FAILURE); \
-    }
+	if(!((p) = calloc(l, s))){ \
+		fprintf(stderr, "insufficient memory"); \
+		exit(EXIT_FAILURE); \
+	}
 #define FREE(p) \
-    free(p); \
-    p = NULL; \
+	free(p); \
+p = NULL; \
 
 
 void listdir(const char *name, int indent);
