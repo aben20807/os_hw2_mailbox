@@ -34,54 +34,7 @@ int main(int argc, char **argv)
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
 	// listdir(directory, 0);
-	Queue *q = NULL;
-	init(&q);
-	// printf("%d\n", q->count);
-	printf("%d\n", q->size(q));
-	mail_t m = {{"a"}, "p"};
-	mail_t m2 = {{"b"}, "u"};
-	mail_t m3 = {{"c"}, "t"};
-	// printf("%s, %s\n", m.data.query_word, m.file_path);
-	// q->enq(q, &m);
-	// printf("%d\n", q->size(q));
-	// mail_t m2 = {{"b"}, "u"};
-	// printf("%s, %s\n", m2.data.query_word, m2.file_path);
-	// q->enq(q, &m2);
-	// printf("%d\n", q->size(q));
-	// node_ptr p = q->deq(q);
-	// printf("%s, %s\n", p->mail.data.query_word, p->mail.file_path);
-	// printf("%d\n", q->size(q));
-	// p = q->deq(q);
-	// printf("%s, %s\n", p->mail.data.query_word, p->mail.file_path);
-	// printf("%d\n", q->size(q));
-	// printf("\nmaster finished\n\n");
-
-	node_ptr np = (node_ptr)create_node(&m);
-	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
-	q->enq(q, np);
-	printf("%d\n", q->size(q));
-
-	np = (node_ptr)create_node(&m2);
-	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
-	q->enq(q, np);
-	printf("%d\n", q->size(q));
-
-	np = q->deq(q);
-	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
-	printf("%d\n", q->size(q));
-
-	np = (node_ptr)create_node(&m3);
-	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
-	q->enq(q, np);
-	printf("%d\n", q->size(q));
-
-	np = q->deq(q);
-	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
-	printf("%d\n", q->size(q));
-
-	np = q->deq(q);
-	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
-	printf("%d\n", q->size(q));
+	test_queue();
 }
 
 void init(Queue **q_ptr)
@@ -203,4 +156,41 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 	 * write something or nothing
 	 */
 	return 0;
+}
+
+void test_queue()
+{
+	Queue *q = NULL;
+	init(&q);
+	mail_t m1 = {{"a"}, "p"};
+	mail_t m2 = {{"b"}, "u"};
+	mail_t m3 = {{"c"}, "t"};
+	node_ptr np = NULL;
+
+	np = (node_ptr)create_node(&m1);
+	q->enq(q, np);
+	printf("enq1, size: %d\n", q->size(q));
+	printf("en: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
+
+	np = (node_ptr)create_node(&m2);
+	q->enq(q, np);
+	printf("enq2, size: %d\n", q->size(q));
+	printf("en: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
+
+	np = q->deq(q);
+	printf("deq1, size: %d\n", q->size(q));
+	printf("de: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
+
+	np = (node_ptr)create_node(&m3);
+	q->enq(q, np);
+	printf("enq3, size: %d\n", q->size(q));
+	printf("en: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
+
+	np = q->deq(q);
+	printf("deq2, size: %d\n", q->size(q));
+	printf("de: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
+
+	np = q->deq(q);
+	printf("deq3, size: %d\n", q->size(q));
+	printf("de: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
 }

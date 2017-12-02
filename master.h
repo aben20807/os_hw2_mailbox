@@ -29,12 +29,11 @@
 
 typedef struct mail_t mail_t;
 typedef struct mail_t *mail_ptr;
-// typedef struct Queue *queue_ptr;
 typedef struct node *node_ptr;
 struct node {
 	struct mail_t *mail_p;
-	struct node *prev;      //pointer to previous node (Closer to front)
-	struct node *next;      //pointer to next node (Closer to back)
+	struct node *prev;
+	struct node *next;
 };
 
 typedef struct Queue {
@@ -45,7 +44,6 @@ typedef struct Queue {
 	bool (*enq)();
 	node_ptr (*deq)();
 } Queue;
-// queue_ptr fullname_queue;
 
 void init(Queue **q_ptr);
 int size(Queue *self);
@@ -54,5 +52,7 @@ node_ptr deq(Queue *self);
 
 node_ptr create_node(mail_ptr mail_p);
 void listdir(const char *name, int indent);
+
+void test_queue();
 
 #endif
