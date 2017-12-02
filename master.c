@@ -30,13 +30,11 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
+	create_slave(num_slave);
 	printf("query_word: %s\n", query_word);
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
 
-	// init(&fullname_queue);
-	// listdir(directory, 0);
-	create_slave(num_slave);   // filename = entry->d_name;
 	printf("\nmaster finished\n\n");
 }
 
@@ -163,15 +161,22 @@ void listdir(const char *name, int layer)
 	closedir(dir);
 }
 
+/*
+ * Create n slaves, n = num_slave
+ */
 void create_slave(int num)
 {
 	while (num--) {
 		pid_t pid = fork();
-		if (pid == 0) {
+		printf("%d\n", pid);
+		if (pid < 0) {
+			perror("fork error");
+			return;
+		} else if (pid == 0) {
 			char *full_path = NULL;
 			CALLOC(full_path, PATH_MAX, sizeof(char));
 			realpath("slave", full_path);
-			printf("%s\n", full_path);
+			// printf("%s\n", full_path);
 			execl(full_path, "slave", NULL);
 		}
 	}
