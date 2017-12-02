@@ -34,14 +34,9 @@ int main(int argc, char **argv)
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
 
-	init(&fullname_queue);
-	listdir(directory, 0);
-	fullname_queue->display(fullname_queue);
-	printf("size: %d\n", fullname_queue->size(fullname_queue));
-	fullname_queue->deq(fullname_queue);
-	fullname_queue->deq(fullname_queue);
-	fullname_queue->display(fullname_queue);
-	printf("size: %d\n", fullname_queue->size(fullname_queue));
+	// init(&fullname_queue);
+	// listdir(directory, 0);
+	test_listdir();
 }
 
 void init(Queue **q_ptr)
@@ -237,4 +232,16 @@ void test_queue()
 	np = q->deq(q);
 	printf("deq3, size: %d\n", q->size(q));
 	printf("de: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
+}
+
+void test_listdir()
+{
+	init(&fullname_queue);
+	listdir(directory, 0);
+	fullname_queue->display(fullname_queue);
+	printf("size: %d\n", fullname_queue->size(fullname_queue));
+	fullname_queue->deq(fullname_queue);
+	fullname_queue->deq(fullname_queue);
+	fullname_queue->display(fullname_queue);
+	printf("size: %d\n", fullname_queue->size(fullname_queue));
 }

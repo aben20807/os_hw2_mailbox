@@ -64,5 +64,6 @@ node_ptr create_node(mail_ptr mail_p);
 void listdir(const char *name, int indent);
 
 void test_queue();
+void test_listdir();
 
 #endif
