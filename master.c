@@ -36,7 +36,8 @@ int main(int argc, char **argv)
 
 	// init(&fullname_queue);
 	// listdir(directory, 0);
-	test_listdir();
+	create_slave(num_slave);   // filename = entry->d_name;
+	printf("\nmaster finished\n\n");
 }
 
 void init(Queue **q_ptr)
@@ -160,6 +161,20 @@ void listdir(const char *name, int layer)
 		}
 	}
 	closedir(dir);
+}
+
+void create_slave(int num)
+{
+	while (num--) {
+		pid_t pid = fork();
+		if (pid == 0) {
+			char *full_path = NULL;
+			CALLOC(full_path, PATH_MAX, sizeof(char));
+			realpath("slave", full_path);
+			printf("%s\n", full_path);
+			execl(full_path, "slave", NULL);
+		}
+	}
 }
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)

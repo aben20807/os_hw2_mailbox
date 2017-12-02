@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <linux/limits.h> // PATH_MAX
+#include <unistd.h>
 
 // #define _GNU_SOURCE
 #define ERRMSG_SIZE 30
@@ -62,7 +63,7 @@ bool display(Queue *self);
 mail_ptr create_mail(const char *q_w, const char *f_p);
 node_ptr create_node(mail_ptr mail_p);
 void listdir(const char *name, int indent);
-void create_slave(const int num);
+void create_slave(int num);
 
 void test_queue();
 void test_listdir();
