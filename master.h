@@ -50,6 +50,7 @@ int size(Queue *self);
 bool enq(Queue *self, node_ptr item);
 node_ptr deq(Queue *self);
 
+mail_ptr create_mail(const char *q_w, const char *f_p);
 node_ptr create_node(mail_ptr mail_p);
 void listdir(const char *name, int indent);
 
