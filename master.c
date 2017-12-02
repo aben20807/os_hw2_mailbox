@@ -38,6 +38,10 @@ int main(int argc, char **argv)
 	listdir(directory, 0);
 	fullname_queue->display(fullname_queue);
 	printf("size: %d\n", fullname_queue->size(fullname_queue));
+	fullname_queue->deq(fullname_queue);
+	fullname_queue->deq(fullname_queue);
+	fullname_queue->display(fullname_queue);
+	printf("size: %d\n", fullname_queue->size(fullname_queue));
 }
 
 void init(Queue **q_ptr)
@@ -84,6 +88,7 @@ node_ptr deq(Queue *self)
 	}
 	node_ptr tmp = self->tail;
 	self->tail = self->tail->prev;
+	self->tail->next = NULL;
 	self->count--;
 	return tmp;
 }
