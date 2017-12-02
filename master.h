@@ -62,6 +62,7 @@ bool display(Queue *self);
 mail_ptr create_mail(const char *q_w, const char *f_p);
 node_ptr create_node(mail_ptr mail_p);
 void listdir(const char *name, int indent);
+void create_slave(const int num);
 
 void test_queue();
 void test_listdir();

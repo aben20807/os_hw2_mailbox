@@ -58,6 +58,9 @@ int size(Queue *self)
 	return self->count;
 }
 
+/*
+ * Insert a node which cantains a mail_t into queue at head.
+ */
 bool enq(Queue *self, node_ptr item)
 {
 	if ((self == NULL) || (item == NULL)) {
@@ -70,12 +73,14 @@ bool enq(Queue *self, node_ptr item)
 		self->head->prev = item;
 		item->next = self->head;
 		self->head = item;
-
 	}
 	self->count++;
 	return true;
 }
 
+/*
+ * Remove a node which cantains a mail_t from queue at tail.
+ */
 node_ptr deq(Queue *self)
 {
 	if ((self == NULL) || self->size(self) == 0) {
@@ -88,6 +93,9 @@ node_ptr deq(Queue *self)
 	return tmp;
 }
 
+/*
+ * Display all nodes in queue from head to tail.
+ */
 bool display(Queue *self)
 {
 	if (self == NULL) {
@@ -124,6 +132,9 @@ node_ptr create_node(mail_ptr mail_p)
 	return tmp;
 }
 
+/*
+ * Use recursive to get all files under input directory and insert to queue.
+ */
 void listdir(const char *name, int layer)
 {
 	DIR *dir;
