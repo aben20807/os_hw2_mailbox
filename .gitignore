@@ -1,5 +1,6 @@
 *.o
 *.sh
 *.orig
+*.swp
 master
 slave
