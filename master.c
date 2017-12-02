@@ -36,16 +36,52 @@ int main(int argc, char **argv)
 	// listdir(directory, 0);
 	Queue *q = NULL;
 	init(&q);
-	printf("%d\n", q->count);
+	// printf("%d\n", q->count);
 	printf("%d\n", q->size(q));
 	mail_t m = {{"a"}, "p"};
-	printf("%s, %s\n", m.data.query_word, m.file_path);
-	q->enq(q, &m);
+	mail_t m2 = {{"b"}, "u"};
+	mail_t m3 = {{"c"}, "t"};
+	// printf("%s, %s\n", m.data.query_word, m.file_path);
+	// q->enq(q, &m);
+	// printf("%d\n", q->size(q));
+	// mail_t m2 = {{"b"}, "u"};
+	// printf("%s, %s\n", m2.data.query_word, m2.file_path);
+	// q->enq(q, &m2);
+	// printf("%d\n", q->size(q));
+	// node_ptr p = q->deq(q);
+	// printf("%s, %s\n", p->mail.data.query_word, p->mail.file_path);
+	// printf("%d\n", q->size(q));
+	// p = q->deq(q);
+	// printf("%s, %s\n", p->mail.data.query_word, p->mail.file_path);
+	// printf("%d\n", q->size(q));
+	// printf("\nmaster finished\n\n");
+
+	node_ptr np = (node_ptr)create_node(&m);
+	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
+	q->enq(q, np);
 	printf("%d\n", q->size(q));
-	node_ptr p = q->deq(q);
-	printf("%s, %s\n", p->mail.data.query_word, p->mail.file_path);
+
+	np = (node_ptr)create_node(&m2);
+	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
+	q->enq(q, np);
 	printf("%d\n", q->size(q));
-	printf("\nmaster finished\n\n");
+
+	np = q->deq(q);
+	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
+	printf("%d\n", q->size(q));
+
+	np = (node_ptr)create_node(&m3);
+	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
+	q->enq(q, np);
+	printf("%d\n", q->size(q));
+
+	np = q->deq(q);
+	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
+	printf("%d\n", q->size(q));
+
+	np = q->deq(q);
+	printf("%s, %s\n", np->mail_p->data.query_word, np->mail_p->file_path);
+	printf("%d\n", q->size(q));
 }
 
 void init(Queue **q_ptr)
@@ -66,20 +102,39 @@ int size(Queue *self)
 	return self->count;
 }
 
-void enq(Queue *self, node_ptr item)
+bool enq(Queue *self, node_ptr item)
 {
-	if (self->size() == 0) {
+	if ((self == NULL) || (item == NULL)) {
+		return false;
+	}
+	if (self->size(self) == 0) {
 		self->head = item;
 		self->tail = item;
+	} else {
+		self->head->prev = item;
+		self->head = item;
 	}
 	self->count++;
+	return true;
 }
 
 node_ptr deq(Queue *self)
 {
+	if ((self == NULL) || self->size(self) == 0) {
+		return NULL;
+	}
 	node_ptr tmp = self->tail;
 	self->tail = self->tail->prev;
 	self->count--;
+	return tmp;
+}
+
+node_ptr create_node(mail_ptr mail_p)
+{
+	node_ptr tmp = NULL;
+	CALLOC(tmp, sizeof(*tmp), 1);
+	CALLOC(tmp->mail_p, sizeof(tmp->mail_p), 1);
+	tmp->mail_p = mail_p;
 	return tmp;
 }
 
