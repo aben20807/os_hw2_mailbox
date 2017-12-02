@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	printf("query_word: %s\n", query_word);
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
-
+	test_listdir();
 	char c;
 	while (true) {
 		scanf(" %c", &c);
@@ -149,6 +149,12 @@ void listdir(const char *name, int layer)
 	struct dirent *entry;
 	if (!(dir = opendir(name)))
 		return;
+	if (name[0] != '/') {
+		char *full_path = NULL;
+		CALLOC(full_path, PATH_MAX, sizeof(char));
+		realpath(name, full_path);
+		name = full_path;
+	}
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_type == DT_DIR) {
 			char path[1024];
