@@ -31,6 +31,7 @@ int main(int argc, char **argv)
 		}
 	}
 	create_slave(num_slave);
+	print_list(slave_list);
 	printf("query_word: %s\n", query_word);
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
@@ -132,7 +133,7 @@ node_ptr create_node(mail_ptr mail_p)
 }
 
 /*
- * Use recursive to get all files under input directory and insert to queue.
+ * Be use recursive to get all files under input directory and insert to queue.
  */
 void listdir(const char *name, int layer)
 {
@@ -166,9 +167,13 @@ void listdir(const char *name, int layer)
  */
 void create_slave(int num)
 {
+	slave_list = NULL;
+	MALLOC(slave_list, sizeof(struct element));
+	element_ptr curr_ptr = slave_list;
+	bool is_first = true;
 	while (num--) {
 		pid_t pid = fork();
-		printf("%d\n", pid);
+		// printf("%d\n", pid);
 		if (pid < 0) {
 			perror("fork error");
 			return;
@@ -178,8 +183,40 @@ void create_slave(int num)
 			realpath("slave", full_path);
 			// printf("%s\n", full_path);
 			execl(full_path, "slave", NULL);
+		} else {
+			if (!is_first) {
+				MALLOC(curr_ptr->next, sizeof(struct element));
+				curr_ptr = curr_ptr->next;
+			}
+			curr_ptr->pid = pid;
+			curr_ptr->next = NULL;
+			is_first = false;
 		}
 	}
+}
+
+void delete_list(const List l)
+{
+	element_ptr curr_ptr = l;
+	while (curr_ptr != NULL) {
+		element_ptr tmp = curr_ptr;
+		curr_ptr = curr_ptr->next;
+		FREE(tmp);
+	}
+}
+
+void print_list(const List l)
+{
+	element_ptr curr_ptr = l;
+	while (curr_ptr != NULL) {
+		printf("%d ", curr_ptr->pid);
+		curr_ptr = curr_ptr->next;
+	}
+}
+
+void kill_all_slave()
+{
+
 }
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)

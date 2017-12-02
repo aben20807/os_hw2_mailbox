@@ -29,6 +29,10 @@
     free(p); \
     p = NULL; \
 
+/*
+ * Queue
+ * Be used to store all full fullname under target directory.
+ */
 typedef struct mail_t mail_t;
 typedef struct mail_t *mail_ptr;
 typedef struct node *node_ptr;
@@ -48,12 +52,20 @@ typedef struct Queue {
 	bool (*display)();
 } Queue;
 
-/*Global Variable*/
+typedef struct element *element_ptr;
+typedef element_ptr List;
+struct element {
+	pid_t pid;
+	element_ptr next;
+};
+
+/* Global Variable */
 Queue *fullname_queue;
 char *query_word;
 char *directory;
+List slave_list;
 
-/*Queue Function*/
+/* Queue Function */
 void init(Queue **q_ptr);
 int size(Queue *self);
 bool enq(Queue *self, node_ptr item);
@@ -64,6 +76,9 @@ mail_ptr create_mail(const char *q_w, const char *f_p);
 node_ptr create_node(mail_ptr mail_p);
 void listdir(const char *name, int indent);
 void create_slave(int num);
+void delete_list(const List l);
+void print_list(const List l);
+void kill_all_slave();
 
 void test_queue();
 void test_listdir();
