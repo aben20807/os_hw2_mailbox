@@ -3,6 +3,7 @@
 int main(int argc, char **argv)
 {
 	printf("slave start...\n\n");
+	while (1) {}
 	printf("\nslave finished\n\n");
 }
 

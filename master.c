@@ -36,6 +36,14 @@ int main(int argc, char **argv)
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
 
+	char c;
+	while (true) {
+		scanf(" %c", &c);
+		if (c == 'k') {
+			kill_all_slave(slave_list);
+			break;
+		}
+	}
 	printf("\nmaster finished\n\n");
 }
 
@@ -214,9 +222,15 @@ void print_list(const List l)
 	}
 }
 
-void kill_all_slave()
+void kill_all_slave(const List l)
 {
-
+	element_ptr curr_ptr = l;
+	while (curr_ptr != NULL) {
+		element_ptr tmp = curr_ptr;
+		curr_ptr = curr_ptr->next;
+		kill(tmp->pid, SIGKILL);
+		FREE(tmp);
+	}
 }
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)

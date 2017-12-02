@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <linux/limits.h> // PATH_MAX
 #include <unistd.h>
+#include <signal.h> // kill
 
 // #define _GNU_SOURCE
 #define ERRMSG_SIZE 30
