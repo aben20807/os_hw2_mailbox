@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
 
-	fullname_queue = NULL;
+	// fullname_queue = NULL;
 	//     DIR *dir = opendir(directory);
 	//     if (dir == NULL) {
 	//         char *err_msg = NULL;
@@ -59,8 +59,70 @@ int main(int argc, char **argv)
 	//     }
 	//     closedir(dir);
 
-	listdir(directory, 0);
+	// listdir(directory, 0);
+	Queue *q = NULL;
+	init(&q);
+	printf("%d\n", q->count);
+	printf("%d\n", q->size(q));
+	mail_t m = {{"a"}, "p"};
+	printf("%s, %s\n", m.data.query_word, m.file_path);
+	// mail_t *mm = NULL;
+	// CALLOC(mm, sizeof(mail_ptr), 1);
+	// strncpy(mm->data.query_word, "a", sizeof(mm->data.query_word));
+	q->enq(q, &m);
+	printf("%d\n", q->size(q));
+	node_ptr p = q->deq(q);
+	printf("%s, %s\n", p->mail.data.query_word, p->mail.file_path);
+	printf("%d\n", q->size(q));
 	printf("\nmaster finished\n\n");
+}
+
+void init(Queue **q_ptr)
+{
+	Queue *q = NULL;
+	MALLOC(q, sizeof(Queue));
+	q->count = 0;
+	q->head = NULL;
+	q->tail = NULL;
+	q->size = size;
+	q->enq = enq;
+	q->deq = deq;
+	*q_ptr = q;
+}
+
+int size(Queue *self)
+{
+	return self->count;
+}
+
+void enq(Queue *self, node_ptr item)
+{
+	if (self->size() == 0) {
+		self->head = item;
+		self->tail = item;
+	}
+	self->count++;
+	// node_ptr tmp = NULL;
+	// MALLOC(tmp, sizeof(struct node));
+	// tmp->mail = *mail;
+	// self->head->prev = tmp;
+	// self->head = self->head->prev;
+}
+
+node_ptr deq(Queue *self)
+{
+	// mail_ptr m = NULL;
+	// MALLOC(m, sizeof(mail_ptr));
+	// *m = self->tail->mail;
+	// node_ptr tmp = self->tail;
+	// self->tail = self->tail->prev;
+	// self->tail->next = NULL;
+	// FREE(tmp);
+	// return m;
+	node_ptr tmp = self->tail;
+	self->tail = self->tail->prev;
+	self->count--;
+	return tmp;
 }
 
 void listdir(const char *name, int layer)

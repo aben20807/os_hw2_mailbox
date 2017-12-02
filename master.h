@@ -12,10 +12,6 @@
 #define _GNU_SOURCE
 #define ERRMSG_SIZE 30
 
-typedef struct mail_t *mail_ptr;
-typedef mail_ptr Queue;
-Queue fullname_queue;
-
 #define MALLOC(p, s) \
 	if(!((p) = malloc(s))){ \
 		fprintf(stderr, "insufficient memory"); \
@@ -28,8 +24,32 @@ Queue fullname_queue;
 	}
 #define FREE(p) \
 	free(p); \
-p = NULL; \
+	p = NULL; \
 
+typedef struct mail_t mail_t;
+typedef struct mail_t *mail_ptr;
+// typedef struct Queue *queue_ptr;
+typedef struct node *node_ptr;
+struct node {
+	struct mail_t mail;
+	struct node *prev;      //pointer to previous node (Closer to front)
+	struct node *next;      //pointer to next node (Closer to back)
+};
+
+typedef struct Queue {
+	int count;
+	node_ptr head;
+	node_ptr tail;
+	int (*size)();
+	void (*enq)();
+	node_ptr (*deq)();
+} Queue;
+// queue_ptr fullname_queue;
+
+void init(Queue **q_ptr);
+int size(Queue *self);
+void enq(Queue *self, node_ptr item);
+node_ptr deq(Queue *self);
 
 void listdir(const char *name, int indent);
 
