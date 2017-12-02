@@ -3,8 +3,8 @@
 int main(int argc, char **argv)
 {
 	printf("master start...\n\n");
-	char *query_word = NULL;
-	char *directory = NULL;
+	query_word = NULL;
+	directory = NULL;
 	int num_slave = 1;
 	char arg;
 	while ((arg = getopt(argc, argv, "q:d:s:")) != -1) {
@@ -33,8 +33,11 @@ int main(int argc, char **argv)
 	printf("query_word: %s\n", query_word);
 	printf("directory: %s\n", directory);
 	printf("num_slave: %d\n", num_slave);
-	// listdir(directory, 0);
-	test_queue();
+
+	init(&fullname_queue);
+	listdir(directory, 0);
+	fullname_queue->display(fullname_queue);
+	printf("size: %d\n", fullname_queue->size(fullname_queue));
 }
 
 void init(Queue **q_ptr)
@@ -47,6 +50,7 @@ void init(Queue **q_ptr)
 	q->size = size;
 	q->enq = enq;
 	q->deq = deq;
+	q->display = display;
 	*q_ptr = q;
 }
 
@@ -65,7 +69,9 @@ bool enq(Queue *self, node_ptr item)
 		self->tail = item;
 	} else {
 		self->head->prev = item;
+		item->next = self->head;
 		self->head = item;
+
 	}
 	self->count++;
 	return true;
@@ -82,6 +88,23 @@ node_ptr deq(Queue *self)
 	return tmp;
 }
 
+bool display(Queue *self)
+{
+	if (self == NULL) {
+		return false;
+	}
+	printf("head->\n");
+	node_ptr curr = self->head;
+	int count = 0;
+	while (curr != NULL) {
+		printf("%d:\n%s\n%s\n", count++, curr->mail_p->data.query_word,
+		       curr->mail_p->file_path);
+		curr = curr->next;
+	}
+	printf("<-tail\n");
+	return true;
+}
+
 mail_ptr create_mail(const char *q_w, const char *f_p)
 {
 	mail_ptr tmp = NULL;
@@ -96,6 +119,8 @@ node_ptr create_node(mail_ptr mail_p)
 	node_ptr tmp = NULL;
 	CALLOC(tmp, sizeof(*tmp), 1);
 	tmp->mail_p = mail_p;
+	tmp->prev = NULL;
+	tmp->next = NULL;
 	return tmp;
 }
 
@@ -108,13 +133,19 @@ void listdir(const char *name, int layer)
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_type == DT_DIR) {
 			char path[1024];
-			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			if (strcmp(entry->d_name, ".") == 0 ||
+			    strcmp(entry->d_name, "..") == 0) {
 				continue;
-			// snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
+			}
+			snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
 			// printf("%*s[%s]\n", layer, "", entry->d_name);
 			listdir(path, layer + 2);
 		} else {
 			// printf("%*s- %s\n", layer, "", entry->d_name);
+			char fullname[PATH_MAX + 1];
+			snprintf(fullname, sizeof(fullname), "%s/%s", name, entry->d_name);
+			node_ptr tmp = create_node(create_mail(query_word, fullname));
+			fullname_queue->enq(fullname_queue, tmp);
 		}
 	}
 	closedir(dir);

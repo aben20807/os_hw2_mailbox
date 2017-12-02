@@ -9,8 +9,9 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdbool.h>
+#include <linux/limits.h> // PATH_MAX
 
-#define _GNU_SOURCE
+// #define _GNU_SOURCE
 #define ERRMSG_SIZE 30
 
 #define MALLOC(p, s) \
@@ -43,12 +44,20 @@ typedef struct Queue {
 	int (*size)();
 	bool (*enq)();
 	node_ptr (*deq)();
+	bool (*display)();
 } Queue;
 
+/*Global Variable*/
+Queue *fullname_queue;
+char *query_word;
+char *directory;
+
+/*Queue Function*/
 void init(Queue **q_ptr);
 int size(Queue *self);
 bool enq(Queue *self, node_ptr item);
 node_ptr deq(Queue *self);
+bool display(Queue *self);
 
 mail_ptr create_mail(const char *q_w, const char *f_p);
 node_ptr create_node(mail_ptr mail_p);
