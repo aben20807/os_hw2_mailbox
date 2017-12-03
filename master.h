@@ -35,29 +35,27 @@
  * Be used to store all full fullname under target directory.
  */
 typedef struct mail_t mail_t;
-typedef struct mail_t *mail_ptr;
-typedef struct node *node_ptr;
-struct node {
+typedef struct node {
 	struct mail_t *mail_p;
 	struct node *prev;
 	struct node *next;
-};
+} node;
 
 typedef struct Queue {
 	int count;
-	node_ptr head;
-	node_ptr tail;
+	node *head;
+	node *tail;
 	int (*size)();
 	bool (*enq)();
-	node_ptr (*deq)();
+	node *(*deq)();
 	bool (*display)();
 } Queue;
 
-typedef struct element *element_ptr;
-typedef element_ptr List;
+typedef struct element element;
+typedef element *List;
 struct element {
 	pid_t pid;
-	element_ptr next;
+	element *next;
 };
 
 /* Global Variable */
@@ -69,12 +67,12 @@ List slave_list;
 /* Queue Function */
 void init(Queue **q_ptr);
 int size(Queue *self);
-bool enq(Queue *self, node_ptr item);
-node_ptr deq(Queue *self);
+bool enq(Queue *self, node *item);
+node *deq(Queue *self);
 bool display(Queue *self);
 
-mail_ptr create_mail(const char *q_w, const char *f_p);
-node_ptr create_node(mail_ptr mail_p);
+mail_t *create_mail(const char *q_w, const char *f_p);
+node *create_node(mail_t *mail_p);
 void listdir(const char *name, int indent);
 void create_slave(int num);
 void delete_list(const List l);

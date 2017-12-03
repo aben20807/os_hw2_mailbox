@@ -69,7 +69,7 @@ int size(Queue *self)
 /*
  * Insert a node which cantains a mail_t into queue at head.
  */
-bool enq(Queue *self, node_ptr item)
+bool enq(Queue *self, node *item)
 {
 	if ((self == NULL) || (item == NULL)) {
 		return false;
@@ -89,12 +89,12 @@ bool enq(Queue *self, node_ptr item)
 /*
  * Remove a node which cantains a mail_t from queue at tail.
  */
-node_ptr deq(Queue *self)
+node *deq(Queue *self)
 {
 	if ((self == NULL) || self->size(self) == 0) {
 		return NULL;
 	}
-	node_ptr tmp = self->tail;
+	node *tmp = self->tail;
 	self->tail = self->tail->prev;
 	self->tail->next = NULL;
 	self->count--;
@@ -110,7 +110,7 @@ bool display(Queue *self)
 		return false;
 	}
 	printf("head->\n");
-	node_ptr curr = self->head;
+	node *curr = self->head;
 	int count = 0;
 	while (curr != NULL) {
 		printf("%d:\n%s\n%s\n", count++, curr->mail_p->data.query_word,
@@ -121,18 +121,18 @@ bool display(Queue *self)
 	return true;
 }
 
-mail_ptr create_mail(const char *q_w, const char *f_p)
+mail_t *create_mail(const char *q_w, const char *f_p)
 {
-	mail_ptr tmp = NULL;
+	mail_t *tmp = NULL;
 	CALLOC(tmp, sizeof(*tmp), 1);
 	strncpy(tmp->data.query_word, q_w, sizeof(tmp->data.query_word));
 	strncpy(tmp->file_path, f_p, sizeof(tmp->file_path));
 	return tmp;
 }
 
-node_ptr create_node(mail_ptr mail_p)
+node *create_node(mail_t *mail_p)
 {
-	node_ptr tmp = NULL;
+	node *tmp = NULL;
 	CALLOC(tmp, sizeof(*tmp), 1);
 	tmp->mail_p = mail_p;
 	tmp->prev = NULL;
@@ -149,7 +149,7 @@ void listdir(const char *name, int layer)
 	struct dirent *entry;
 	if (!(dir = opendir(name)))
 		return;
-	if (name[0] != '/') {
+	if (name[0] != '/') { // relative path
 		char *full_path = NULL;
 		CALLOC(full_path, PATH_MAX, sizeof(char));
 		realpath(name, full_path);
@@ -169,7 +169,7 @@ void listdir(const char *name, int layer)
 			// printf("%*s- %s\n", layer, "", entry->d_name);
 			char fullname[PATH_MAX + 1];
 			snprintf(fullname, sizeof(fullname), "%s/%s", name, entry->d_name);
-			node_ptr tmp = create_node(create_mail(query_word, fullname));
+			node *tmp = create_node(create_mail(query_word, fullname));
 			fullname_queue->enq(fullname_queue, tmp);
 		}
 	}
@@ -183,7 +183,7 @@ void create_slave(int num)
 {
 	slave_list = NULL;
 	MALLOC(slave_list, sizeof(struct element));
-	element_ptr curr_ptr = slave_list;
+	element *curr_ptr = slave_list;
 	bool is_first = true;
 	while (num--) {
 		pid_t pid = fork();
@@ -211,9 +211,9 @@ void create_slave(int num)
 
 void delete_list(const List l)
 {
-	element_ptr curr_ptr = l;
+	element *curr_ptr = l;
 	while (curr_ptr != NULL) {
-		element_ptr tmp = curr_ptr;
+		element *tmp = curr_ptr;
 		curr_ptr = curr_ptr->next;
 		FREE(tmp);
 	}
@@ -221,7 +221,7 @@ void delete_list(const List l)
 
 void print_list(const List l)
 {
-	element_ptr curr_ptr = l;
+	element *curr_ptr = l;
 	while (curr_ptr != NULL) {
 		printf("%d ", curr_ptr->pid);
 		curr_ptr = curr_ptr->next;
@@ -230,9 +230,9 @@ void print_list(const List l)
 
 void kill_all_slave(const List l)
 {
-	element_ptr curr_ptr = l;
+	element *curr_ptr = l;
 	while (curr_ptr != NULL) {
-		element_ptr tmp = curr_ptr;
+		element *tmp = curr_ptr;
 		curr_ptr = curr_ptr->next;
 		kill(tmp->pid, SIGKILL);
 		FREE(tmp);
@@ -289,17 +289,17 @@ void test_queue()
 {
 	Queue *q = NULL;
 	init(&q);
-	mail_ptr m1 = create_mail("d", "p");
-	mail_ptr m2 = create_mail("e", "u");
-	mail_ptr m3 = create_mail("f", "t");
-	node_ptr np = NULL;
+	mail_t *m1 = create_mail("d", "p");
+	mail_t *m2 = create_mail("e", "u");
+	mail_t *m3 = create_mail("f", "t");
+	node *np = NULL;
 
-	np = (node_ptr)create_node(m1);
+	np = create_node(m1);
 	q->enq(q, np);
 	printf("enq1, size: %d\n", q->size(q));
 	printf("en: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
 
-	np = (node_ptr)create_node(m2);
+	np = create_node(m2);
 	q->enq(q, np);
 	printf("enq2, size: %d\n", q->size(q));
 	printf("en: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
@@ -308,7 +308,7 @@ void test_queue()
 	printf("deq1, size: %d\n", q->size(q));
 	printf("de: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
 
-	np = (node_ptr)create_node(m3);
+	np = create_node(m3);
 	q->enq(q, np);
 	printf("enq3, size: %d\n", q->size(q));
 	printf("en: %s, %s\n\n", np->mail_p->data.query_word, np->mail_p->file_path);
