@@ -8,11 +8,17 @@ int main(int argc, char **argv)
 	char *q_w, *f_p;
 	extract_mail(m1, &q_w, &f_p);
 	printf("%s\n%s\n", q_w, f_p);
-	printf("%d", word_count(q_w, f_p));
+	// printf("%d", word_count(q_w, f_p));
+	FREE(m1);
+	m1 = create_mail(word_count(q_w, f_p), f_p);
+	printf("%d\n%s\n", m1->data.word_count, m1->file_path);
 
 	printf("\nslave finished\n\n");
 }
 
+/*
+ * Extract mail into query_word and file_path.
+ */
 void extract_mail(const mail_t *m, char **q_w, char **f_p)
 {
 	MALLOC(*q_w, strlen(m->data.query_word) + 1);
@@ -61,6 +67,15 @@ next:
 end:
 	fclose(fin);
 	return count;
+}
+
+mail_t *create_mail(const int w_c, const char *f_p)
+{
+	mail_t *tmp = NULL;
+	CALLOC(tmp, sizeof(*tmp), 1);
+	tmp->data.word_count = w_c;
+	strncpy(tmp->file_path, f_p, sizeof(tmp->file_path));
+	return tmp;
 }
 
 #ifdef MAIL_DEBUG // test from master
