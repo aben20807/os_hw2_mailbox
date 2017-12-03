@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <linux/limits.h> // PATH_MAX
+#include <fcntl.h> // open
 
 #define ERR_EMPTY -1
 #define ERR_FULL -2

@@ -30,21 +30,41 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
-	create_slave(num_slave);
-	print_list(slave_list);
-	printf("query_word: %s\n", query_word);
-	printf("directory: %s\n", directory);
-	printf("num_slave: %d\n", num_slave);
-	test_listdir();
-	char c;
-	while (true) {
-		scanf(" %c", &c);
-		if (c == 'k') {
-			kill_all_slave(slave_list);
-			break;
-		}
-	}
+	// create_slave(num_slave);
+	// print_list(slave_list);
+	// printf("query_word: %s\n", query_word);
+	// printf("directory: %s\n", directory);
+	// printf("num_slave: %d\n", num_slave);
+
+	mail_t *mail = create_mail("f", "t");
+	int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
+	printf("%d\n", sysfs_fd);
+	send_to_fd(sysfs_fd, mail);
+	sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
+	receive_from_fd(sysfs_fd, mail);
 	printf("\nmaster finished\n\n");
+}
+
+int send_to_fd(int sysfs_fd, struct mail_t *mail)
+{
+	printf("write\n");
+	int ret_val = write(sysfs_fd, mail, sizeof(mail));
+	if (ret_val == ERR_FULL) {
+		printf("full\n");
+	} else {
+	}
+	return 0;
+}
+
+int receive_from_fd(int sysfs_fd, struct mail_t *mail)
+{
+	printf("read\n");
+	int ret_val = read(sysfs_fd, mail, sizeof(mail));
+	if (ret_val == ERR_EMPTY) {
+		printf("empty\n");
+	} else {
+	}
+	return 0;
 }
 
 void init(Queue **q_ptr)
@@ -237,52 +257,6 @@ void kill_all_slave(const List l)
 		kill(tmp->pid, SIGKILL);
 		FREE(tmp);
 	}
-}
-
-int send_to_fd(int sysfs_fd, struct mail_t *mail)
-{
-	/*
-	 * write something or nothing
-	 */
-
-	// int ret_val = write(sysfs_fd, ...);
-	// if (ret_val == ERR_FULL) {
-	/*
-	 * write something or nothing
-	 */
-	// } else {
-	/*
-	 * write something or nothing
-	 */
-	// }
-
-	/*
-	 * write something or nothing
-	 */
-	return 0;
-}
-
-int receive_from_fd(int sysfs_fd, struct mail_t *mail)
-{
-	/*
-	 * write something or nothing
-	 */
-
-	// int ret_val = read(sysfs_fd, ...);
-	// if (ret_val == ERR_EMPTY) {
-	/*
-	 * write something or nothing
-	 */
-	// } else {
-	/*
-	 * write something or nothing
-	 */
-	// }
-
-	/*
-	 * write something or nothing
-	 */
-	return 0;
 }
 
 void test_queue()

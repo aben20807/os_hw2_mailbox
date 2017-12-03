@@ -24,12 +24,14 @@ static void get_process_name(char *ouput_name)
 static ssize_t mailbox_read(struct kobject *kobj,
                             struct kobj_attribute *attr, char *buf)
 {
+	printk("call mailbox_read\n");
 	return ERR_EMPTY;
 }
 
 static ssize_t mailbox_write(struct kobject *kobj,
                              struct kobj_attribute *attr, const char *buf, size_t count)
 {
+	printk("call mailbox_write\n");
 	return ERR_FULL;
 }
 
