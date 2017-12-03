@@ -3,26 +3,74 @@
 int main(int argc, char **argv)
 {
 	printf("slave start...\n\n");
-	mail_t *m1 = create_mail("d", "p");
+	mail_t *m1 = create_mail("apple", "/home/user/col5/os/test_set/a.txt");
 	char *q_w, *f_p;
 	extract_mail(m1, &q_w, &f_p);
 	printf("%s\n%s\n", q_w, f_p);
-	while (1) {}
+	printf("%d", word_count(q_w, "/home/user/col5/os/test_set/a.txt"));
+	// FILE *fin = NULL;
+	// char *path = NULL;
+	// MALLOC(path, sizeof(char) * PATH_MAX);
+	// snprintf(path, PATH_MAX, "/home/user/col5/os/test_set/a.txt");
+	// open_file(&fin, path);
+	// while (1) {}
 	printf("\nslave finished\n\n");
 }
 
 void extract_mail(const mail_t *m, char **q_w, char **f_p)
 {
-	CALLOC(*q_w, strlen(m->data.query_word), sizeof(char));
-	CALLOC(*f_p, strlen(m->file_path), sizeof(char));
-	// mail_t *tmp = NULL;
-	// CALLOC(tmp, sizeof(*tmp), 1);
-	*q_w = m->data.query_word;
-	*f_p = m->file_path;
-	// strncpy(*q_w, m->data.query_word, sizeof(m->data.query_word));
-	// strncpy(*f_p, m->file_path, sizeof(m->file_path));
+	MALLOC(*q_w, strlen(m->data.query_word) + 1);
+	MALLOC(*f_p, strlen(m->file_path) + 1);
+	strcpy(*q_w, m->data.query_word);
+	strcpy(*f_p, m->file_path);
 }
 
+bool open_file(FILE **fin, const char *file_path)
+{
+	if (!(*fin = fopen(file_path, "r"))) {
+		perror(file_path);
+		return false;
+	} else {
+		return true;
+	}
+}
+
+int word_count(const char* q_w, const char* f_p)
+{
+	FILE *fin = NULL;
+	int count = 0;
+	int ch, len;
+	// if (!open_file(&fin, f_p)) {
+	//  return -1;
+	// }
+	// return 0;
+	if (NULL == (fin = fopen(f_p, "r")))
+		return -1;
+	len = strlen(q_w);
+	for (;;) {
+		int i;
+		if ((ch = fgetc(fin)) == EOF)
+			break;
+		if ((char)ch != *q_w)
+			continue;
+		for (i = 1; i < len; ++i) {
+			if ((ch = fgetc(fin)) == EOF)
+				goto end;
+			if ((char)ch != q_w[i]) {
+				fseek(fin, 1 - i, SEEK_CUR);
+				goto next;
+			}
+		}
+		++count;
+next:
+		;
+	}
+end:
+	fclose(fin);
+	return count;
+}
+
+#ifdef MAIL_DEBUG
 mail_t *create_mail(const char *q_w, const char *f_p) // test from master
 {
 	mail_t *tmp = NULL;
@@ -31,6 +79,7 @@ mail_t *create_mail(const char *q_w, const char *f_p) // test from master
 	strncpy(tmp->file_path, f_p, sizeof(tmp->file_path));
 	return tmp;
 }
+#endif
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
