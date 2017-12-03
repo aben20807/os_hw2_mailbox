@@ -7,11 +7,10 @@ int main(int argc, char **argv)
 	mail_t *m1 = create_mail_master("apple", "/home/user/col5/os/test_set/a.txt");
 	char *q_w, *f_p;
 	extract_mail(m1, &q_w, &f_p);
-	printf("%s\n%s\n", q_w, f_p);
+	printf("from m: %s\n%s\n", q_w, f_p);
 	// printf("%d", word_count(q_w, f_p));
-	FREE(m1);
 	m1 = create_mail(word_count(q_w, f_p), f_p);
-	printf("%d\n%s\n", m1->data.word_count, m1->file_path);
+	printf("from s: %d\n%s\n", m1->data.word_count, m1->file_path);
 
 	printf("\nslave finished\n\n");
 }
@@ -19,12 +18,13 @@ int main(int argc, char **argv)
 /*
  * Extract mail into query_word and file_path.
  */
-void extract_mail(const mail_t *m, char **q_w, char **f_p)
+void extract_mail(mail_t *m, char **q_w, char **f_p)
 {
 	MALLOC(*q_w, strlen(m->data.query_word) + 1);
 	MALLOC(*f_p, strlen(m->file_path) + 1);
 	strcpy(*q_w, m->data.query_word);
 	strcpy(*f_p, m->file_path);
+	FREE(m);
 }
 
 bool open_file(FILE **fin, const char *file_path)
@@ -37,7 +37,10 @@ bool open_file(FILE **fin, const char *file_path)
 	}
 }
 
-int word_count(const char* q_w, const char* f_p)
+/*
+ * Count number of words in file form file_path.
+ */
+int word_count(char *q_w, const char *f_p)
 {
 	FILE *fin = NULL;
 	if (!open_file(&fin, f_p)) {
@@ -60,24 +63,29 @@ int word_count(const char* q_w, const char* f_p)
 				goto next;
 			}
 		}
-		++count;
+		count++;
 next:
 		;
 	}
 end:
 	fclose(fin);
+	FREE(q_w);
 	return count;
 }
 
-mail_t *create_mail(const int w_c, const char *f_p)
+mail_t *create_mail(const int w_c, char *f_p)
 {
 	mail_t *tmp = NULL;
 	CALLOC(tmp, sizeof(*tmp), 1);
 	tmp->data.word_count = w_c;
 	strncpy(tmp->file_path, f_p, sizeof(tmp->file_path));
+	FREE(f_p);
 	return tmp;
 }
 
+/*
+ * Test as get mail from master.
+ */
 #ifdef MAIL_DEBUG // test from master
 mail_t *create_mail_master(const char *q_w, const char *f_p)
 {
