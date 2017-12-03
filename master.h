@@ -2,39 +2,19 @@
 #define MASTER_H
 
 #include "mail.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <getopt.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <string.h>
-#include <stdbool.h>
-#include <linux/limits.h> // PATH_MAX
-#include <unistd.h>
+#include <unistd.h> // execl
 #include <signal.h> // kill
 
 // #define _GNU_SOURCE
 #define ERRMSG_SIZE 30
 
-#define MALLOC(p, s) \
-    if(!((p) = malloc(s))){ \
-        fprintf(stderr, "insufficient memory"); \
-        exit(EXIT_FAILURE); \
-    }
-#define CALLOC(p, l, s) \
-    if(!((p) = calloc(l, s))){ \
-        fprintf(stderr, "insufficient memory"); \
-        exit(EXIT_FAILURE); \
-    }
-#define FREE(p) \
-    free(p); \
-    p = NULL; \
-
 /*
  * Queue
  * Be used to store all full fullname under target directory.
  */
-typedef struct mail_t mail_t;
 typedef struct node {
 	struct mail_t *mail_p;
 	struct node *prev;
