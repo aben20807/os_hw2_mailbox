@@ -30,18 +30,18 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
-	// create_slave(num_slave);
+	create_slave(num_slave);
 	// print_list(slave_list);
 	// printf("query_word: %s\n", query_word);
 	// printf("directory: %s\n", directory);
 	// printf("num_slave: %d\n", num_slave);
 
-	mail_t *mail = create_mail("f", "t");
-	int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
-	printf("%d\n", sysfs_fd);
-	send_to_fd(sysfs_fd, mail);
-	sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
-	receive_from_fd(sysfs_fd, mail);
+	// mail_t *mail = create_mail("f", "t");
+	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
+	// printf("%d\n", sysfs_fd);
+	// send_to_fd(sysfs_fd, mail);
+	// sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
+	// receive_from_fd(sysfs_fd, mail);
 	printf("\nmaster finished\n\n");
 }
 

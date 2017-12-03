@@ -48,21 +48,33 @@ int word_count(char *q_w, const char *f_p)
 	}
 	int count = 0;
 	int len = strlen(q_w);
-	char c;
+	char c, cl;
 	while (true) {
 		int i;
-		if ((c = fgetc(fin)) == EOF)
+		if ((c = fgetc(fin)) == EOF) {
 			break;
-		if ((char)c != *q_w)
+		}
+		if (c >= 'A' && c <= 'Z') {
+			c -= ('A' - 'a');
+		}
+		if (c != *q_w) {
+			cl = c;
 			continue;
-		for (i = 1; i < len; ++i) {
+		}
+		for (i = 1; i < len + 1; i++) {
 			if ((c = fgetc(fin)) == EOF)
 				goto end;
-			if ((char)c != q_w[i]) {
+			if (i == len && !is_delimiter(c)) {
+				count--;
+			}
+			if (c != q_w[i] || !is_delimiter(cl)) {
+				if (i == len)
+					goto count;
 				fseek(fin, 1 - i, SEEK_CUR);
 				goto next;
 			}
 		}
+count:
 		count++;
 next:
 		;
@@ -71,6 +83,11 @@ end:
 	fclose(fin);
 	FREE(q_w);
 	return count;
+}
+
+bool is_delimiter(const char c)
+{
+	return (c == ',' || c == '.' || c == '!' || c == '?' || c == ' ' || c == '\n');
 }
 
 mail_t *create_mail(const int w_c, char *f_p)
