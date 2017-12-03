@@ -3,17 +3,13 @@
 int main(int argc, char **argv)
 {
 	printf("slave start...\n\n");
-	mail_t *m1 = create_mail("apple", "/home/user/col5/os/test_set/a.txt");
+
+	mail_t *m1 = create_mail_master("apple", "/home/user/col5/os/test_set/a.txt");
 	char *q_w, *f_p;
 	extract_mail(m1, &q_w, &f_p);
 	printf("%s\n%s\n", q_w, f_p);
-	printf("%d", word_count(q_w, "/home/user/col5/os/test_set/a.txt"));
-	// FILE *fin = NULL;
-	// char *path = NULL;
-	// MALLOC(path, sizeof(char) * PATH_MAX);
-	// snprintf(path, PATH_MAX, "/home/user/col5/os/test_set/a.txt");
-	// open_file(&fin, path);
-	// while (1) {}
+	printf("%d", word_count(q_w, f_p));
+
 	printf("\nslave finished\n\n");
 }
 
@@ -38,25 +34,22 @@ bool open_file(FILE **fin, const char *file_path)
 int word_count(const char* q_w, const char* f_p)
 {
 	FILE *fin = NULL;
-	int count = 0;
-	int ch, len;
-	// if (!open_file(&fin, f_p)) {
-	//  return -1;
-	// }
-	// return 0;
-	if (NULL == (fin = fopen(f_p, "r")))
+	if (!open_file(&fin, f_p)) {
 		return -1;
-	len = strlen(q_w);
-	for (;;) {
+	}
+	int count = 0;
+	int len = strlen(q_w);
+	char c;
+	while (true) {
 		int i;
-		if ((ch = fgetc(fin)) == EOF)
+		if ((c = fgetc(fin)) == EOF)
 			break;
-		if ((char)ch != *q_w)
+		if ((char)c != *q_w)
 			continue;
 		for (i = 1; i < len; ++i) {
-			if ((ch = fgetc(fin)) == EOF)
+			if ((c = fgetc(fin)) == EOF)
 				goto end;
-			if ((char)ch != q_w[i]) {
+			if ((char)c != q_w[i]) {
 				fseek(fin, 1 - i, SEEK_CUR);
 				goto next;
 			}
@@ -70,8 +63,8 @@ end:
 	return count;
 }
 
-#ifdef MAIL_DEBUG
-mail_t *create_mail(const char *q_w, const char *f_p) // test from master
+#ifdef MAIL_DEBUG // test from master
+mail_t *create_mail_master(const char *q_w, const char *f_p)
 {
 	mail_t *tmp = NULL;
 	CALLOC(tmp, sizeof(*tmp), 1);

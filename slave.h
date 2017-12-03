@@ -9,7 +9,8 @@ int word_count(const char* q_w, const char* f_p);
 
 #define MAIL_DEBUG
 #ifdef MAIL_DEBUG
-mail_t *create_mail(const char *q_w, const char *f_p); // test from master
+mail_t *create_mail_master(const char *q_w,
+                           const char *f_p); // test from master
 #endif
 
 #endif
