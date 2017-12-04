@@ -51,6 +51,7 @@ bool enq(Queue *self, node *item);
 node *deq(Queue *self);
 bool display(Queue *self);
 
+char *mail_to_string(mail_t *m);
 mail_t *create_mail(const char *q_w, const char *f_p);
 node *create_node(mail_t *mail_p);
 void listdir(const char *name, int indent);
@@ -61,5 +62,6 @@ void kill_all_slave();
 
 void test_queue();
 void test_listdir();
+void test_mail_to_string();
 
 #endif
