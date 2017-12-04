@@ -31,8 +31,18 @@ static ssize_t mailbox_read(struct kobject *kobj,
 static ssize_t mailbox_write(struct kobject *kobj,
                              struct kobj_attribute *attr, const char *buf, size_t count)
 {
-	printk("call mailbox_write\n");
-	return ERR_FULL;
+	// mailbox_entry_t *tmp = NULL; // tmp = kmalloc(sizeof(mailbox_entry_t), GFP_KERNEL);
+	// tmp->mail_p = kmalloc(sizeof(mailbox_entry_t), GFP_KERNEL);
+	// // sscanf(buf, "%du", &tmp->mail_p);
+	// memcpy(tmp, buf, sizeof(char) * count);
+	// list_add(&tmp->entry, &m_head->head);
+	// mail_t *m = (mail_t *)kobj;
+	// mail_t *m = NULL;
+	// m = to_mail(kobj);
+	printk("call mailbox_write %s\n", buf);
+	// printk("call mailbox_write %s\n", m->file_path);
+	// return ERR_FULL;
+	return 0;
 }
 
 static int __init mailbox_init(void)
@@ -40,6 +50,10 @@ static int __init mailbox_init(void)
 	printk("Insert\n");
 	hw2_kobject = kobject_create_and_add("hw2", kernel_kobj);
 	sysfs_create_file(hw2_kobject, &mailbox_attribute.attr);
+	// INIT_LIST_HEAD(&m_head->head);
+	// m_head = kmalloc(sizeof(mailbox_head_t), GFP_KERNEL);
+	// m_head->head =
+	// INIT_LIST_HEAD(&m_head->head);
 	return 0;
 }
 

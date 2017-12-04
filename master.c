@@ -50,7 +50,7 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
 	printf("write\n");
 	char *mail_str = mail_to_string(mail);
-	int ret_val = write(sysfs_fd, mail_str, sizeof(mail));
+	int ret_val = write(sysfs_fd, mail_str, sizeof(char) * strlen(mail_str));
 	if (ret_val == ERR_FULL) {
 		printf("full\n");
 	} else {
@@ -335,7 +335,11 @@ void test_mail_to_string()
 	node *curr = fullname_queue->head;
 	while (curr != NULL) {
 		mail_t *mail = create_mail(query_word, curr->mail_p->file_path);
-		printf("%s\n", mail_to_string(mail));
+		// printf("%s\n", mail_to_string(mail));
+		int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
+		// printf("%d\n", sysfs_fd);
+		send_to_fd(sysfs_fd, mail);
+		close(sysfs_fd);
 		curr = curr->next;
 	}
 }
