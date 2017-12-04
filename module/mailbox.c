@@ -39,10 +39,15 @@ static ssize_t mailbox_write(struct kobject *kobj,
 	// mail_t *m = (mail_t *)kobj;
 	// mail_t *m = NULL;
 	// m = to_mail(kobj);
-	printk("call mailbox_write %s\n", buf);
+	mail_t *m = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
+	// printk("call mailbox_write %ld: %s\n", count, buf);
+	// printk("buf siz %ld\n", PAGE_SIZE);
+	// m = (struct mail_t *)buf;
+	memcpy(m, buf - 64, count);
+	printk("mail: %s, %s\n", m->data.query_word, m->file_path);
 	// printk("call mailbox_write %s\n", m->file_path);
 	// return ERR_FULL;
-	return 0;
+	return count;
 }
 
 static int __init mailbox_init(void)

@@ -48,12 +48,15 @@ int main(int argc, char **argv)
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
-	printf("write\n");
-	char *mail_str = mail_to_string(mail);
-	int ret_val = write(sysfs_fd, mail_str, sizeof(char) * strlen(mail_str));
+	// printf("write %ld\n", sizeof(*mail));
+	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	// char *mail_str = mail_to_string(mail);
+	// int ret_val = write(sysfs_fd, mail_str, sizeof(char) * strlen(mail_str));
+	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
 	if (ret_val == ERR_FULL) {
 		printf("full\n");
 	} else {
+		// printf("count: %d\n", ret_val);
 	}
 	return 0;
 }
