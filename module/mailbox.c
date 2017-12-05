@@ -37,14 +37,26 @@ static ssize_t mailbox_write(struct kobject *kobj,
 	if (m_head == NULL) {
 		m_head = kmalloc(sizeof(struct mailbox_head_t), GFP_KERNEL);
 		INIT_LIST_HEAD(&m_head->head);
+		m_head->count = 0;
+		for (int i = 0; i < num_entry_max; i++) {
+			mailbox_entry_t *m_entry = kmalloc(sizeof(struct mailbox_entry_t), GFP_KERNEL);
+			m_entry->mail_p = NULL;
+			list_add(&m_entry->entry, &m_head->head);
+		}
 	}
-	m = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
-	memcpy(m, buf - offsetof(struct mail_t, data), count);
-	printk("mail: %s, %s\n", m->data.query_word, m->file_path);
-	if (m != NULL) {
-		mailbox_entry_t *m_entry = kmalloc(sizeof(struct mailbox_entry_t), GFP_KERNEL);
-		m_entry->mail_p = m;
-		list_add(&m_entry->entry, &m_head->head);
+	if (m_head->count < num_entry_max) {
+		m = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
+		memcpy(m, buf - offsetof(struct mail_t, data), count);
+		printk("mail: %s, %s\n", m->data.query_word, m->file_path);
+		if (m != NULL) {
+			// mailbox_entry_t *m_entry = kmalloc(sizeof(struct mailbox_entry_t), GFP_KERNEL);
+			m_head->count++;
+			// m_entry->mail_p = m;
+			// list_add(&m_entry->entry, &m_head->head);
+		}
+	} else {
+		printk("ERR_FULL: %d\n", ERR_FULL);
+		return ERR_FULL;
 	}
 	// printk("---- Data =  %ld -----\n", offsetof(mail_t, data));
 	// printk("---- Data =  %ld -----\n", offsetof(mail_t, file_path));
@@ -54,7 +66,6 @@ static ssize_t mailbox_write(struct kobject *kobj,
 	//     printk("%s\n", tmp->mail_p->file_path);
 	// }
 	// printk("\n");
-	// return ERR_FULL;
 	return count;
 }
 

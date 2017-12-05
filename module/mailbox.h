@@ -18,6 +18,7 @@
 
 typedef struct mailbox_head_t mailbox_head_t;
 struct mailbox_head_t {
+	int count;
 	struct list_head head;
 };
 mailbox_head_t *m_head;

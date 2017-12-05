@@ -50,10 +50,10 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
 	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
-	if (ret_val == ERR_FULL) {
-		printf("full\n");
+	if (ret_val < 0) {
+		printf("ERR_FULL\n");
 	} else {
-		// printf("count: %d\n", ret_val);
+		printf("count: %zd\n", (ssize_t)ret_val);
 	}
 	return 0;
 }
