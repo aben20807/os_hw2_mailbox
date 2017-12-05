@@ -32,14 +32,14 @@ static ssize_t mailbox_write(struct kobject *kobj,
                              struct kobj_attribute *attr, const char *buf, size_t count)
 {
 	mail_t *m;
-	struct list_head *iter;
-	mailbox_entry_t *tmp;
+	// struct list_head *iter;
+	// mailbox_entry_t *tmp;
 	if (m_head == NULL) {
 		m_head = kmalloc(sizeof(struct mailbox_head_t), GFP_KERNEL);
 		INIT_LIST_HEAD(&m_head->head);
 	}
 	m = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
-	memcpy(m, buf - 64, count); // mysterious power number: 64
+	memcpy(m, buf - offsetof(struct mail_t, data), count);
 	printk("mail: %s, %s\n", m->data.query_word, m->file_path);
 	if (m != NULL) {
 		mailbox_entry_t *m_entry = kmalloc(sizeof(struct mailbox_entry_t), GFP_KERNEL);
@@ -47,11 +47,13 @@ static ssize_t mailbox_write(struct kobject *kobj,
 		list_add(&m_entry->entry, &m_head->head);
 	}
 	printk("In list:\n");
-	list_for_each(iter, &m_head->head) {
-		tmp = list_entry(iter, struct mailbox_entry_t, entry);
-		printk("%s\n", tmp->mail_p->file_path);
-	}
-	printk("\n");
+	printk("---- Data =  %ld -----\n", offsetof(mail_t, data));
+	printk("---- Data =  %ld -----\n", offsetof(mail_t, file_path));
+	// list_for_each(iter, &m_head->head) {
+	//     tmp = list_entry(iter, struct mailbox_entry_t, entry);
+	//     printk("%s\n", tmp->mail_p->file_path);
+	// }
+	// printk("\n");
 	// return ERR_FULL;
 	return count;
 }

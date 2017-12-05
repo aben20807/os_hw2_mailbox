@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <unistd.h> // execl
 #include <signal.h> // kill
+#include <stddef.h> // offsetof
 
 // #define _GNU_SOURCE
 #define ERRMSG_SIZE 30

@@ -16,8 +16,6 @@
 #define ERR_EMPTY -1
 #define ERR_FULL -2
 
-#define to_mail(x) container_of(x, struct mail_t, kobj)
-
 typedef struct mailbox_head_t mailbox_head_t;
 struct mailbox_head_t {
 	struct list_head head;

@@ -50,6 +50,9 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
 	// printf("write %ld\n", sizeof(*mail));
 	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	printf("---- Data =  %d -----\n", offsetof(mail_t, data.query_word));
+	// printk("---- Data =  %d -----\n", offsetof(struct mail_t, data.query_word));
+	printf("---- Data =  %d -----\n", offsetof(mail_t, file_path));
 	// char *mail_str = mail_to_string(mail);
 	// int ret_val = write(sysfs_fd, mail_str, sizeof(char) * strlen(mail_str));
 	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
