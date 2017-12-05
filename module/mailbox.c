@@ -31,9 +31,9 @@ static ssize_t mailbox_read(struct kobject *kobj,
 static ssize_t mailbox_write(struct kobject *kobj,
                              struct kobj_attribute *attr, const char *buf, size_t count)
 {
-	mail_t *m;
-	// struct list_head *iter;
-	// mailbox_entry_t *tmp;
+	mail_t *mail;
+	struct list_head *iter;
+	mailbox_entry_t *curr;
 	if (m_head == NULL) {
 		m_head = kmalloc(sizeof(struct mailbox_head_t), GFP_KERNEL);
 		INIT_LIST_HEAD(&m_head->head);
@@ -45,11 +45,24 @@ static ssize_t mailbox_write(struct kobject *kobj,
 		}
 	}
 	if (m_head->count < num_entry_max) {
-		m = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
-		memcpy(m, buf - offsetof(struct mail_t, data), count);
-		printk("mail: %s, %s\n", m->data.query_word, m->file_path);
-		if (m != NULL) {
-			// mailbox_entry_t *m_entry = kmalloc(sizeof(struct mailbox_entry_t), GFP_KERNEL);
+		mail = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
+		memcpy(mail, buf - offsetof(struct mail_t, data), count);
+		printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		if (mail != NULL) {
+			// curr = m_head->head.next;
+			// for (int i = 0; i < m_head->count; i++) {
+			//     curr->entry = curr->entry.next;
+			// }
+			// curr->mail_p = mail;
+			int each_count = 0;
+			list_for_each(iter, &m_head->head) {
+				if (each_count == m_head->count) {
+					curr = list_entry(iter, struct mailbox_entry_t, entry);
+					curr->mail_p = mail;
+					// printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+				}
+				each_count++;
+			}
 			m_head->count++;
 			// m_entry->mail_p = m;
 			// list_add(&m_entry->entry, &m_head->head);
@@ -58,14 +71,14 @@ static ssize_t mailbox_write(struct kobject *kobj,
 		printk("ERR_FULL: %d\n", ERR_FULL);
 		return ERR_FULL;
 	}
-	// printk("---- Data =  %ld -----\n", offsetof(mail_t, data));
-	// printk("---- Data =  %ld -----\n", offsetof(mail_t, file_path));
-	// printk("In list:\n");
-	// list_for_each(iter, &m_head->head) {
-	//     tmp = list_entry(iter, struct mailbox_entry_t, entry);
-	//     printk("%s\n", tmp->mail_p->file_path);
-	// }
-	// printk("\n");
+	printk("In list:\n");
+	list_for_each(iter, &m_head->head) {
+		curr = list_entry(iter, struct mailbox_entry_t, entry);
+		if (curr->mail_p != NULL) {
+			printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		}
+	}
+	printk("\n");
 	return count;
 }
 
