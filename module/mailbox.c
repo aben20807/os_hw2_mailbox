@@ -46,9 +46,9 @@ static ssize_t mailbox_write(struct kobject *kobj,
 		m_entry->mail_p = m;
 		list_add(&m_entry->entry, &m_head->head);
 	}
-	printk("In list:\n");
-	printk("---- Data =  %ld -----\n", offsetof(mail_t, data));
-	printk("---- Data =  %ld -----\n", offsetof(mail_t, file_path));
+	// printk("---- Data =  %ld -----\n", offsetof(mail_t, data));
+	// printk("---- Data =  %ld -----\n", offsetof(mail_t, file_path));
+	// printk("In list:\n");
 	// list_for_each(iter, &m_head->head) {
 	//     tmp = list_entry(iter, struct mailbox_entry_t, entry);
 	//     printk("%s\n", tmp->mail_p->file_path);

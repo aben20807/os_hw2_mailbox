@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	// printf("directory: %s\n", directory);
 	// printf("num_slave: %d\n", num_slave);
 
-	test_mail_to_string();
+	test_send_mail_to_fd();
 	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
 	// printf("%d\n", sysfs_fd);
 	// send_to_fd(sysfs_fd, mail);
@@ -48,13 +48,7 @@ int main(int argc, char **argv)
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
-	// printf("write %ld\n", sizeof(*mail));
 	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
-	printf("---- Data =  %d -----\n", offsetof(mail_t, data.query_word));
-	// printk("---- Data =  %d -----\n", offsetof(struct mail_t, data.query_word));
-	printf("---- Data =  %d -----\n", offsetof(mail_t, file_path));
-	// char *mail_str = mail_to_string(mail);
-	// int ret_val = write(sysfs_fd, mail_str, sizeof(char) * strlen(mail_str));
 	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
 	if (ret_val == ERR_FULL) {
 		printf("full\n");
@@ -73,24 +67,6 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 	} else {
 	}
 	return 0;
-}
-
-char *mail_to_string(mail_t *m)
-{
-	size_t len = 0;
-	len = snprintf (NULL, len, "%s@%s",
-	                m->data.query_word, m->file_path);
-	// printf("%d", (int)len);
-	char *result = NULL;
-	CALLOC (result, len + 1, sizeof(char));
-	if (snprintf (result, len + 1, "%s$%s",
-	              m->data.query_word, m->file_path) > len + 1) {
-		fprintf (stderr, "%s() error: snprintf returned truncated result.\n", __func__);
-		FREE(m);
-		return NULL;
-	}
-	FREE(m);
-	return result;
 }
 
 void init(Queue **q_ptr)
@@ -334,7 +310,7 @@ void test_listdir()
 	printf("size: %d\n", fullname_queue->size(fullname_queue));
 }
 
-void test_mail_to_string()
+void test_send_mail_to_fd()
 {
 	init(&fullname_queue);
 	listdir(directory, 0);
