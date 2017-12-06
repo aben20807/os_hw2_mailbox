@@ -63,20 +63,20 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 {
 	printf("read\n");
 	lseek(sysfs_fd, 0, SEEK_SET);
-	// CALLOC(mail, sizeof(struct mail_t), 1);
-	char buf[4096];
-	int ret_val = read(sysfs_fd, buf, sizeof(buf) - 1);
-	memcpy(mail, buf, ret_val);
+	// char buf[BUFSIZ];
+	// int ret_val = read(sysfs_fd, buf, sizeof(buf));
+	int ret_val = read(sysfs_fd, mail, sizeof(*mail));
+	// memcpy(mail, buf, ret_val);
 	// printf("size %ld, len: %ld\n", sizeof(buf), strlen(buf));
 	// printf("%ld\n", sizeof(*mail));
 	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 	if (ret_val < 0) {
 		printf("ERR_EMPTY\n");
+		return ERR_EMPTY;
 	} else {
 		printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
 	}
-	return 0;
 }
 
 void init(Queue **q_ptr)
