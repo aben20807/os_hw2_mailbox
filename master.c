@@ -48,33 +48,30 @@ int main(int argc, char **argv)
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
-	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	// printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
 	lseek(sysfs_fd, 0, SEEK_SET);
 	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
 	if (ret_val < 0) {
 		printf("ERR_FULL\n");
+		return ERR_FULL;
 	} else {
-		printf("count: %zd\n", (ssize_t)ret_val);
+		// printf("count: %zd\n", (ssize_t)ret_val);
+		return ret_val;
 	}
 	return 0;
 }
 
 int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 {
-	printf("read\n");
+	// printf("read\n");
 	lseek(sysfs_fd, 0, SEEK_SET);
-	// char buf[BUFSIZ];
-	// int ret_val = read(sysfs_fd, buf, sizeof(buf));
 	int ret_val = read(sysfs_fd, mail, sizeof(*mail));
-	// memcpy(mail, buf, ret_val);
-	// printf("size %ld, len: %ld\n", sizeof(buf), strlen(buf));
-	// printf("%ld\n", sizeof(*mail));
-	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	// printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 	if (ret_val < 0) {
 		printf("ERR_EMPTY\n");
 		return ERR_EMPTY;
 	} else {
-		printf("count: %zd\n", (ssize_t)ret_val);
+		// printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
 	}
 }
@@ -335,12 +332,10 @@ void test_send_mail_to_fd()
 		curr = curr->next;
 	}
 	int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
-	printf("%d\n", sysfs_fd);
-	mail_t *mail = NULL;// = create_mail(query_word, curr->mail_p->file_path);
+	mail_t *mail = NULL;
 	CALLOC(mail, sizeof(*mail), 1);
-	int t = receive_from_fd(sysfs_fd, mail);
-	printf("%d\n", t);
-	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	while (receive_from_fd(sysfs_fd, mail) != ERR_EMPTY) {
+		printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	}
 	close(sysfs_fd);
-
 }
