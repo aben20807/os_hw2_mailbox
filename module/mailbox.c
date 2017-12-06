@@ -24,8 +24,34 @@ static void get_process_name(char *ouput_name)
 static ssize_t mailbox_read(struct kobject *kobj,
                             struct kobj_attribute *attr, char *buf)
 {
+	int each_count = 0;
+	struct list_head *iter = NULL;
+	mailbox_entry_t *curr = NULL;
 	printk("call mailbox_read\n");
-	return ERR_EMPTY;
+	if (m_head->count == 0) {
+		printk("ERR_FULL: %d\n", ERR_FULL);
+		return ERR_EMPTY;
+	} else {
+		list_for_each(iter, &m_head->head) {
+			printk("%d", each_count);
+			if (each_count == m_head->count - 1) {
+				buf = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
+				// printk("bp size: %ld\n", sizeof(buf));
+				curr = list_entry(iter, struct mailbox_entry_t, entry);
+				printk("mail: %s, %s\n", curr->mail_p->data.query_word,
+				       curr->mail_p->file_path);
+				memcpy(buf, curr->mail_p, 4096);
+				// printk("size: %ld, %ld\n", sizeof(buf), sizeof(*curr->mail_p));
+				// count = sprintf(buf, "%s", curr->mail_p);
+				// curr->mail_p = mail;
+				break;
+			}
+			each_count++;
+		}
+		m_head->count--;
+		printk("size: %ld\n", 32 + strlen(curr->mail_p->file_path));
+		return 32 + strlen(curr->mail_p->file_path);
+	}
 }
 
 static ssize_t mailbox_write(struct kobject *kobj,
@@ -46,26 +72,19 @@ static ssize_t mailbox_write(struct kobject *kobj,
 	}
 	if (m_head->count < num_entry_max) {
 		mail = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
-		memcpy(mail, buf - offsetof(struct mail_t, data), count);
+		memcpy(mail, buf, count);
+		// printk("size: %ld, %d\n", strlen(buf), (int)count);
 		printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		if (mail != NULL) {
-			// curr = m_head->head.next;
-			// for (int i = 0; i < m_head->count; i++) {
-			//     curr->entry = curr->entry.next;
-			// }
-			// curr->mail_p = mail;
 			int each_count = 0;
 			list_for_each(iter, &m_head->head) {
 				if (each_count == m_head->count) {
 					curr = list_entry(iter, struct mailbox_entry_t, entry);
 					curr->mail_p = mail;
-					// printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 				}
 				each_count++;
 			}
 			m_head->count++;
-			// m_entry->mail_p = m;
-			// list_add(&m_entry->entry, &m_head->head);
 		}
 	} else {
 		printk("ERR_FULL: %d\n", ERR_FULL);

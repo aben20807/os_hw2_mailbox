@@ -31,7 +31,6 @@ struct mailbox_entry_t {
 
 typedef struct mail_t mail_t;
 struct mail_t {
-	struct kobject kobj;
 	union {
 		char query_word[32];
 		unsigned int word_count;
