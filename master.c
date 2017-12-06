@@ -63,19 +63,18 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 {
 	printf("read\n");
 	lseek(sysfs_fd, 0, SEEK_SET);
-	CALLOC(mail, sizeof(struct mail_t), 1);
+	// CALLOC(mail, sizeof(struct mail_t), 1);
 	char buf[4096];
 	int ret_val = read(sysfs_fd, buf, sizeof(buf) - 1);
 	memcpy(mail, buf, ret_val);
-	// mail = (mail_t *)buf;
-	printf("size %ld, len: %ld\n", sizeof(buf), strlen(buf));
-	printf("%ld\n", sizeof(*mail));
+	// printf("size %ld, len: %ld\n", sizeof(buf), strlen(buf));
+	// printf("%ld\n", sizeof(*mail));
 	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
-	// printf("%ld", offsetof(struct mail_t, data));
 	if (ret_val < 0) {
 		printf("ERR_EMPTY\n");
 	} else {
 		printf("count: %zd\n", (ssize_t)ret_val);
+		return ret_val;
 	}
 	return 0;
 }
@@ -338,8 +337,10 @@ void test_send_mail_to_fd()
 	int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
 	printf("%d\n", sysfs_fd);
 	mail_t *mail = NULL;// = create_mail(query_word, curr->mail_p->file_path);
-	// CALLOC(mail, sizeof(*mail), 1);
-	receive_from_fd(sysfs_fd, mail);
+	CALLOC(mail, sizeof(*mail), 1);
+	int t = receive_from_fd(sysfs_fd, mail);
+	printf("%d\n", t);
+	printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 	close(sysfs_fd);
 
 }
