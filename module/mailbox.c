@@ -33,14 +33,19 @@ static ssize_t mailbox_read(struct kobject *kobj,
 		return ERR_EMPTY;
 	} else {
 		list_for_each(iter, &m_head->head) {
-			printk("%d", each_count);
+			// printk("%d", each_count);
 			if (each_count == m_head->count - 1) {
-				buf = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
+				// buf = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
 				// printk("bp size: %ld\n", sizeof(buf));
 				curr = list_entry(iter, struct mailbox_entry_t, entry);
 				printk("mail: %s, %s\n", curr->mail_p->data.query_word,
 				       curr->mail_p->file_path);
-				memcpy(buf, curr->mail_p, 4096);
+				// memcpy(buf, curr->mail_p, 4095);
+				// memcpy(buf, curr->mail_p, 32 + strlen(curr->mail_p->file_path));
+				memcpy(buf, curr->mail_p, 32 + strlen(curr->mail_p->file_path));
+				// buf = (char *)curr->mail_p;
+				// printk("%s\n", buf);
+				// printk("size %ld, len: %ld\n", sizeof(buf), strlen(buf));
 				// printk("size: %ld, %ld\n", sizeof(buf), sizeof(*curr->mail_p));
 				// count = sprintf(buf, "%s", curr->mail_p);
 				// curr->mail_p = mail;
@@ -50,6 +55,7 @@ static ssize_t mailbox_read(struct kobject *kobj,
 		}
 		m_head->count--;
 		printk("size: %ld\n", 32 + strlen(curr->mail_p->file_path));
+		// return 4095;
 		return 32 + strlen(curr->mail_p->file_path);
 	}
 }
