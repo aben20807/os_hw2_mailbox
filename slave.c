@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 	// }
 	// close(sysfs_fd);
 
+	// int i = 0;
 	mail_t *mail = NULL;
 	while (true) {
 		CALLOC(mail, sizeof(*mail), 1);
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
 			printf("count: %d\n\n", word_count(q_w, f_p));
 		}
 		close(sysfs_fd);
+		FREE(mail);
 	}
 	printf("\nslave finished\n\n");
 }
@@ -49,7 +51,6 @@ void extract_mail(mail_t *m, char **q_w, char **f_p)
 	MALLOC(*f_p, strlen(m->file_path) + 1);
 	strcpy(*q_w, m->data.query_word);
 	strcpy(*f_p, m->file_path);
-	FREE(m);
 }
 
 bool open_file(FILE **fin, const char *file_path)

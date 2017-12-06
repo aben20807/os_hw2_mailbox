@@ -35,8 +35,8 @@ static ssize_t mailbox_read(struct kobject *kobj,
 		list_for_each(iter, &m_head->head) {
 			if (each_count == m_head->count - 1) {
 				curr = list_entry(iter, struct mailbox_entry_t, entry);
-				printk("mail: %s, %s\n", curr->mail_p->data.query_word,
-				       curr->mail_p->file_path);
+				// printk("mail: %s, %s\n", curr->mail_p->data.query_word,
+				// curr->mail_p->file_path);
 				memcpy(buf, curr->mail_p, 32 + strlen(curr->mail_p->file_path));
 				// kfree(curr->mail_p); // FIXME
 				// curr->mail_p = NULL;
@@ -45,7 +45,7 @@ static ssize_t mailbox_read(struct kobject *kobj,
 			each_count++;
 		}
 		m_head->count--;
-		printk("size: %ld\n", 32 + strlen(curr->mail_p->file_path));
+		// printk("size: %ld\n", 32 + strlen(curr->mail_p->file_path));
 		return 32 + strlen(curr->mail_p->file_path);
 	}
 }
@@ -70,7 +70,7 @@ static ssize_t mailbox_write(struct kobject *kobj,
 		mail = kmalloc(sizeof(struct mail_t), GFP_KERNEL);
 		memcpy(mail, buf, count);
 		// printk("size: %ld, %d\n", strlen(buf), (int)count);
-		printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		// printk("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		if (mail != NULL) {
 			int each_count = 0;
 			list_for_each(iter, &m_head->head) {
@@ -83,7 +83,7 @@ static ssize_t mailbox_write(struct kobject *kobj,
 			m_head->count++;
 		}
 	} else {
-		printk("ERR_FULL: %d\n", ERR_FULL);
+		// printk("ERR_FULL: %d\n", ERR_FULL);
 		return ERR_FULL;
 	}
 	printk("In list:\n");

@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 	// printf("num_slave: %d\n", num_slave);
 
 	test_send_mail_to_fd();
+	// test_queue();
 	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
 	// printf("%d\n", sysfs_fd);
 	// send_to_fd(sysfs_fd, mail);
@@ -61,13 +62,13 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 	lseek(sysfs_fd, 0, SEEK_SET);
 	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
 	if (ret_val < 0) {
-		printf("ERR_FULL\n");
+		// printf("ERR_FULL\n");
 		return ERR_FULL;
 	} else {
+		printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		// printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
 	}
-	return 0;
 }
 
 int receive_from_fd(int sysfs_fd, struct mail_t *mail)
@@ -77,7 +78,7 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 	int ret_val = read(sysfs_fd, mail, sizeof(*mail));
 	// printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 	if (ret_val < 0) {
-		printf("ERR_EMPTY\n");
+		// printf("ERR_EMPTY\n");
 		return ERR_EMPTY;
 	} else {
 		// printf("count: %zd\n", (ssize_t)ret_val);
@@ -130,11 +131,16 @@ bool enq(Queue *self, node *item)
 node *deq(Queue *self)
 {
 	if ((self == NULL) || self->size(self) == 0) {
+		printf("0\n");
 		return NULL;
 	}
 	node *tmp = self->tail;
-	self->tail = self->tail->prev;
-	self->tail->next = NULL;
+	if (self->size(self) != 1) {
+		self->tail = self->tail->prev;
+		self->tail->next = NULL;
+	} else {
+		self->tail = self->head;
+	}
 	self->count--;
 	return tmp;
 }
@@ -330,15 +336,24 @@ void test_send_mail_to_fd()
 {
 	init(&fullname_queue);
 	listdir(directory, 0);
-	node *curr = fullname_queue->head;
-	while (curr != NULL) {
+	// node *curr;// = fullname_queue->head;
+	// fullname_queue->display(fullname_queue);
+	while (fullname_queue->count > 0) {
+		printf("cnt: %d\n", fullname_queue->count);
+		node *curr = fullname_queue->deq(fullname_queue);
 		mail_t *mail = create_mail(query_word, curr->mail_p->file_path);
-		// printf("%s\n", mail_to_string(mail));
+		// mail_t *mail = fullname_queue->deq(fullname_queue);;
+		// printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
 		// printf("%d\n", sysfs_fd);
 		send_to_fd(sysfs_fd, mail);
+		if (send_to_fd(sysfs_fd, mail) == ERR_FULL) {
+			close(sysfs_fd);
+			continue;
+		}
+		FREE(mail);
 		close(sysfs_fd);
-		curr = curr->next;
+		// curr = curr->next;
 	}
 	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
 	// mail_t *mail = NULL;
