@@ -5,7 +5,7 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <unistd.h> // execl
+// #include <unistd.h> // execl
 #include <signal.h> // kill
 
 // #define _GNU_SOURCE

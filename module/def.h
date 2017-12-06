@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <linux/limits.h> // PATH_MAX
 #include <fcntl.h> // open
+#include <unistd.h> // lseek, execl
 
 #define ERR_EMPTY -1
 #define ERR_FULL -2

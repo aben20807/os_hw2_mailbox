@@ -27,9 +27,9 @@ static ssize_t mailbox_read(struct kobject *kobj,
 	int each_count = 0;
 	struct list_head *iter = NULL;
 	mailbox_entry_t *curr = NULL;
-	printk("call mailbox_read\n");
+	// printk("call mailbox_read\n");
 	if (m_head->count == 0) {
-		printk("ERR_FULL: %d\n", ERR_FULL);
+		// printk("ERR_EMPTY: %d\n", ERR_EMPTY);
 		return ERR_EMPTY;
 	} else {
 		list_for_each(iter, &m_head->head) {
@@ -38,6 +38,8 @@ static ssize_t mailbox_read(struct kobject *kobj,
 				printk("mail: %s, %s\n", curr->mail_p->data.query_word,
 				       curr->mail_p->file_path);
 				memcpy(buf, curr->mail_p, 32 + strlen(curr->mail_p->file_path));
+				// kfree(curr->mail_p); // FIXME
+				// curr->mail_p = NULL;
 				break;
 			}
 			each_count++;

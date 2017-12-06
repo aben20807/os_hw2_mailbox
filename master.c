@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
-	// create_slave(num_slave);
+	create_slave(num_slave);
 
 	// print_list(slave_list);
 	// printf("query_word: %s\n", query_word);
@@ -43,6 +43,15 @@ int main(int argc, char **argv)
 	// send_to_fd(sysfs_fd, mail);
 	// sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
 	// receive_from_fd(sysfs_fd, mail);
+	char c;
+	while (true) {
+		scanf(" %c", &c);
+		if (c == 'k') {
+			kill_all_slave(slave_list);
+			break;
+		}
+	}
+
 	printf("\nmaster finished\n\n");
 }
 
@@ -331,11 +340,11 @@ void test_send_mail_to_fd()
 		close(sysfs_fd);
 		curr = curr->next;
 	}
-	int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
-	mail_t *mail = NULL;
-	CALLOC(mail, sizeof(*mail), 1);
-	while (receive_from_fd(sysfs_fd, mail) != ERR_EMPTY) {
-		printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
-	}
-	close(sysfs_fd);
+	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
+	// mail_t *mail = NULL;
+	// CALLOC(mail, sizeof(*mail), 1);
+	// while (receive_from_fd(sysfs_fd, mail) != ERR_EMPTY) {
+	//     printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	// }
+	// close(sysfs_fd);
 }
