@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
-	// create_slave(num_slave);
+	create_slave(num_slave);
 
 	// print_list(slave_list);
 	// printf("query_word: %s\n", query_word);
@@ -351,7 +351,6 @@ void test_send_mail_to_fd()
 			curr = fullname_queue->deq(fullname_queue);
 		}
 		mail_t *mail = create_mail(query_word, curr->mail_p->file_path);
-		// mail_t *mail = fullname_queue->deq(fullname_queue);;
 		printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
 		// printf("%d\n", sysfs_fd);
@@ -365,7 +364,6 @@ void test_send_mail_to_fd()
 		}
 		FREE(mail);
 		close(sysfs_fd);
-		// curr = curr->next;
 	}
 	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
 	// mail_t *mail = NULL;
