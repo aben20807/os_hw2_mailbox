@@ -16,6 +16,8 @@
 #define ERR_EMPTY -1
 #define ERR_FULL -2
 
+spinlock_t lock;
+
 typedef struct mailbox_head_t mailbox_head_t;
 struct mailbox_head_t {
 	int count;

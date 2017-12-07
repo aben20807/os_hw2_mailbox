@@ -339,28 +339,36 @@ void test_send_mail_to_fd()
 	init(&fullname_queue);
 	listdir(directory, 0);
 	// node *curr;// = fullname_queue->head;
-	// fullname_queue->display(fullname_queue);
+	fullname_queue->display(fullname_queue);
 	node *curr = NULL; // = fullname_queue->deq(fullname_queue);
-	bool is_full = false;
+	// bool is_full = false;
 	// int cc = 0;
+	// bool
+	if (fullname_queue->count > 0) {
+		curr = fullname_queue->deq(fullname_queue);
+	}
 	while (true) {
 		// printf("cnt: %d, %d\n", cc++, fullname_queue->count);
 		// fullname_queue->display(fullname_queue);
-		if (fullname_queue->count == 0) break;
-		if (!is_full) {
-			curr = fullname_queue->deq(fullname_queue);
-		}
+		// if (!is_full) {
+		//     curr = fullname_queue->deq(fullname_queue);
+		// }
 		mail_t *mail = create_mail(query_word, curr->mail_p->file_path);
-		printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		// printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
 		// printf("%d\n", sysfs_fd);
 		// send_to_fd(sysfs_fd, mail);
 		if (send_to_fd(sysfs_fd, mail) == ERR_FULL) {
 			close(sysfs_fd);
-			is_full = true;
+			// is_full = true;
+			FREE(mail);
 			continue;
 		} else {
-			is_full = false;
+			// is_full = false;
+			if (fullname_queue->count == 0) break;
+			curr = fullname_queue->deq(fullname_queue);
+			printf("mail: %s, %s\n", curr->mail_p->data.query_word,
+			       curr->mail_p->file_path);
 		}
 		FREE(mail);
 		close(sysfs_fd);

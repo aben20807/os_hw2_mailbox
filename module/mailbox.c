@@ -34,8 +34,10 @@ static ssize_t mailbox_read(struct kobject *kobj,
 		mailbox_entry_t *m_entry = container_of(m_head->head.prev,
 		                                        struct mailbox_entry_t, entry);
 		memcpy(buf, m_entry->mail_p, 32 + strlen(m_entry->mail_p->file_path));
+		spin_lock(&lock);
 		list_del(&m_entry->entry);
 		m_head->count--;
+		spin_unlock(&lock);
 		printk("r: In list:\n");
 		list_for_each(iter, &m_head->head) {
 			curr = list_entry(iter, struct mailbox_entry_t, entry);
@@ -68,8 +70,10 @@ static ssize_t mailbox_write(struct kobject *kobj,
 		if (mail != NULL) {
 			mailbox_entry_t *m_entry = kmalloc(sizeof(struct mailbox_entry_t), GFP_KERNEL);
 			m_entry->mail_p = mail;
+			spin_lock(&lock);
 			list_add(&m_entry->entry, &m_head->head);
 			m_head->count++;
+			spin_unlock(&lock);
 		}
 	} else {
 		// printk("ERR_FULL: %d\n", ERR_FULL);
@@ -93,6 +97,7 @@ static int __init mailbox_init(void)
 	hw2_kobject = kobject_create_and_add("hw2", kernel_kobj);
 	sysfs_create_file(hw2_kobject, &mailbox_attribute.attr);
 	m_head = NULL;
+	spin_lock_init(&lock);
 	return 0;
 }
 
