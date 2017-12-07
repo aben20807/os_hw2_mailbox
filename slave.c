@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 		close(sysfs_fd);
 		FREE(mail);
 	}
+	wordcount_queue->display(wordcount_queue);
 
 	printf("\nslave finished\n\n");
 }
@@ -250,7 +251,7 @@ bool display(Queue *self)
 	node *curr = self->head;
 	int count = 0;
 	while (curr != NULL) {
-		printf("%d:\n%s\n%s\n", count++, curr->mail_p->data.query_word,
+		printf("%d:\n%d\n%s\n", count++, curr->mail_p->data.word_count,
 		       curr->mail_p->file_path);
 		curr = curr->next;
 	}
