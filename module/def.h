@@ -24,8 +24,10 @@
         exit(EXIT_FAILURE); \
     }
 #define FREE(p) \
-    free(p); \
-    p = NULL;
+    if(p != NULL){ \
+        free(p); \
+        p = NULL; \
+    }
 
 typedef struct mail_t mail_t;
 

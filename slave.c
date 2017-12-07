@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 		FREE(mail);
 	}
 	wordcount_queue->display(wordcount_queue);
-
+	send_all_mail();
 	printf("\nslave finished\n\n");
 }
 
@@ -112,7 +112,6 @@ mail_t *create_mail(const int w_c, char *f_p)
 	CALLOC(tmp, sizeof(*tmp), 1);
 	tmp->data.word_count = w_c;
 	strncpy(tmp->file_path, f_p, sizeof(tmp->file_path));
-	FREE(f_p);
 	return tmp;
 }
 
@@ -149,7 +148,7 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 		// printf("ERR_FULL\n");
 		return ERR_FULL;
 	} else {
-		printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		printf("write mail: %d, %s\n", mail->data.word_count, mail->file_path);
 		// printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
 	}
@@ -257,4 +256,30 @@ bool display(Queue *self)
 	}
 	printf("<-tail\n");
 	return true;
+}
+
+void send_all_mail()
+{
+	node *curr = NULL;
+	if (wordcount_queue->count > 0) {
+		curr = wordcount_queue->deq(wordcount_queue);
+	}
+	while (true) {
+		mail_t *mail = create_mail(curr->mail_p->data.word_count,
+		                           curr->mail_p->file_path);
+		printf("mail: %d, %s\n", mail->data.word_count, mail->file_path);
+		int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
+		if (send_to_fd(sysfs_fd, mail) == ERR_FULL) {
+			close(sysfs_fd);
+			FREE(mail);
+			continue;
+		} else {
+			if (wordcount_queue->count == 0) break;
+			curr = wordcount_queue->deq(wordcount_queue);
+			printf("mail: %d, %s\n", curr->mail_p->data.word_count,
+			       curr->mail_p->file_path);
+		}
+		FREE(mail);
+		close(sysfs_fd);
+	}
 }

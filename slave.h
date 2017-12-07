@@ -15,6 +15,7 @@ bool is_delimiter(const char c);
 mail_t *create_mail(const int w_c, char *f_p);
 node *create_node(mail_t *mail_p);
 void handler(int signum);
+void send_all_mail();
 
 /* Queue Function */
 void init(Queue **q_ptr);
