@@ -37,5 +37,6 @@ struct mail_t {
 	} data;
 	char file_path[4096];
 };
+static const struct mail_t empty_mail;
 
 #endif
