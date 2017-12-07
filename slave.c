@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 			extract_mail(mail, &q_w, &f_p);
 			// printf("from m: \n%s\n%s\n", q_w, f_p);
 			int w_c = word_count(q_w, f_p);
-			printf("count: %d\n\n", w_c);
+			printf("count: %d\n", w_c);
 			// create_mail(w_c, f_p);
 			node *tmp = create_node(create_mail(w_c, f_p));
 			wordcount_queue->enq(wordcount_queue, tmp);
@@ -27,8 +27,15 @@ int main(int argc, char **argv)
 		close(sysfs_fd);
 		FREE(mail);
 	}
-	wordcount_queue->display(wordcount_queue);
-	send_all_mail();
+	// wordcount_queue->display(wordcount_queue);
+	// kill(getppid(), SIGUSR1);
+	// printf("slave stop 1\n");
+	// kill(getpid(), SIGSTOP);
+	// send_all_mail();
+	// usleep(100);
+	// printf("slave stop 2\n");
+	// kill(getpid(), SIGSTOP);
+
 	printf("\nslave finished\n\n");
 }
 
@@ -148,7 +155,7 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 		// printf("ERR_FULL\n");
 		return ERR_FULL;
 	} else {
-		printf("write mail: %d, %s\n", mail->data.word_count, mail->file_path);
+		// printf("write mail: %d, %s\n", mail->data.word_count, mail->file_path);
 		// printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
 	}
@@ -173,7 +180,7 @@ void handler(int signum)
 {
 	if (signum == SIGUSR1) {
 		master_send_done = true;
-		printf("Received SIGUSR1!\n");
+		// printf("Received SIGUSR1!\n");
 	}
 }
 
@@ -222,7 +229,7 @@ bool enq(Queue *self, node *item)
 node *deq(Queue *self)
 {
 	if ((self == NULL) || self->size(self) == 0) {
-		printf("0\n");
+		// printf("0\n");
 		return NULL;
 	}
 	node *tmp = self->tail;
@@ -263,11 +270,13 @@ void send_all_mail()
 	node *curr = NULL;
 	if (wordcount_queue->count > 0) {
 		curr = wordcount_queue->deq(wordcount_queue);
+	} else {
+		return;
 	}
 	while (true) {
 		mail_t *mail = create_mail(curr->mail_p->data.word_count,
 		                           curr->mail_p->file_path);
-		printf("mail: %d, %s\n", mail->data.word_count, mail->file_path);
+		// printf("mail: %d, %s\n", mail->data.word_count, mail->file_path);
 		int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_WRONLY);
 		if (send_to_fd(sysfs_fd, mail) == ERR_FULL) {
 			close(sysfs_fd);
@@ -276,8 +285,8 @@ void send_all_mail()
 		} else {
 			if (wordcount_queue->count == 0) break;
 			curr = wordcount_queue->deq(wordcount_queue);
-			printf("mail: %d, %s\n", curr->mail_p->data.word_count,
-			       curr->mail_p->file_path);
+			// printf("mail: %d, %s\n", curr->mail_p->data.word_count,
+			// curr->mail_p->file_path);
 		}
 		FREE(mail);
 		close(sysfs_fd);

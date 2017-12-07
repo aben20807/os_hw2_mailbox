@@ -9,6 +9,7 @@
 #include <fcntl.h> // open
 #include <unistd.h> // lseek, execl
 #include <signal.h> // kill
+#include <sys/wait.h>
 
 #define ERR_EMPTY -1
 #define ERR_FULL -2

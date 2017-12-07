@@ -3,9 +3,12 @@
 int main(int argc, char **argv)
 {
 	printf("master start...\n\n");
+
+	// signal(SIGUSR1, handler);
+	// signal(SIGUSR2, handler);
 	query_word = NULL;
 	directory = NULL;
-	int num_slave = 1;
+	num_slave = 1;
 	char arg;
 	while ((arg = getopt(argc, argv, "q:d:s:")) != -1) {
 		switch (arg) {
@@ -45,14 +48,60 @@ int main(int argc, char **argv)
 	// send_to_fd(sysfs_fd, mail);
 	// sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
 	// receive_from_fd(sysfs_fd, mail);
+
+	// char c;
+	// while (true) {
+	//     scanf(" %c", &c);
+	//     if (c == 'k') {
+	//         kill_all_slave(slave_list);
+	//         break;
+	//     }
+	// }
+	// all_slave_count_done = false;
+	all_slave_send_done = false;
+	// mail_t *mail = NULL;
+	// while (true) {
+	//     if (all_slave_count_done) {
+	//         printf("count done\n");
+	//         break;
+	//     }
+	// }
+	// printf("wait all\n");
+	// wait_all_slave(slave_list);
+	// printf("wake all\n");
+	// wake_all_slave(slave_list);
+	// while (true) {
+	//         printf("in\n");
+	//     CALLOC(mail, sizeof(*mail), 1);
+	//     int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
+	//     printf("%d\n", sysfs_fd);
+	//     if (receive_from_fd(sysfs_fd, mail) != ERR_EMPTY) {
+	//         // printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	//         int w_c = 0;
+	//         char *f_p;
+	//         extract_mail(mail, &w_c, &f_p);
+	//         // printf("from m: \n%s\n%s\n", q_w, f_p);
+	//         printf("count: %d\n\n", w_c);
+	//     } else {
+	//         printf("EMP\n");
+	//         if (is_all_slave_stop(slave_list)) {
+	//             printf("all stop\n");
+	//             break;
+	//         }
+	//     }
+	//     close(sysfs_fd);
+	//     FREE(mail);
+	// }
 	char c;
 	while (true) {
-		scanf(" %c", &c);
+		printf("enter 'k'\n");
+		scanf("%c", &c);
 		if (c == 'k') {
 			kill_all_slave(slave_list);
 			break;
 		}
 	}
+
 
 	printf("\nmaster finished\n\n");
 }
@@ -66,7 +115,7 @@ int send_to_fd(int sysfs_fd, struct mail_t *mail)
 		// printf("ERR_FULL\n");
 		return ERR_FULL;
 	} else {
-		printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		// printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
 		// printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
 	}
@@ -132,7 +181,7 @@ bool enq(Queue *self, node *item)
 node *deq(Queue *self)
 {
 	if ((self == NULL) || self->size(self) == 0) {
-		printf("0\n");
+		// printf("0\n");
 		return NULL;
 	}
 	node *tmp = self->tail;
@@ -185,6 +234,13 @@ node *create_node(mail_t *mail_p)
 	tmp->prev = NULL;
 	tmp->next = NULL;
 	return tmp;
+}
+
+void extract_mail(mail_t *m, int *w_c, char **f_p)
+{
+	MALLOC(*f_p, strlen(m->file_path) + 1);
+	*w_c = m->data.word_count;
+	strcpy(*f_p, m->file_path);
 }
 
 /*
@@ -243,6 +299,7 @@ void create_slave(int num)
 			CALLOC(full_path, PATH_MAX, sizeof(char));
 			realpath("slave", full_path);
 			// printf("%s\n", full_path);
+			// sleep(1);
 			execl(full_path, "slave", NULL);
 		} else {
 			if (!is_first) {
@@ -296,6 +353,42 @@ void notify_all_slave(const List l)
 	}
 }
 
+void wait_all_slave(const List l)
+{
+	element *curr_ptr = l;
+	while (curr_ptr != NULL) {
+		element *tmp = curr_ptr;
+		curr_ptr = curr_ptr->next;
+		int status;
+		waitpid(tmp->pid, &status, WUNTRACED);
+	}
+}
+
+bool is_all_slave_stop(const List l)
+{
+	element *curr_ptr = l;
+	while (curr_ptr != NULL) {
+		element *tmp = curr_ptr;
+		curr_ptr = curr_ptr->next;
+		int status;
+		waitpid(tmp->pid, &status, 0);
+		if (waitpid(tmp->pid, &status, WNOHANG) == 0)
+			printf("still\n");
+		return false;
+	}
+	return true;
+}
+
+void wake_all_slave(const List l)
+{
+	element *curr_ptr = l;
+	while (curr_ptr != NULL) {
+		element *tmp = curr_ptr;
+		curr_ptr = curr_ptr->next;
+		kill(tmp->pid, SIGCONT);
+	}
+}
+
 void send_all_mail()
 {
 	init(&fullname_queue);
@@ -304,6 +397,8 @@ void send_all_mail()
 	node *curr = NULL;
 	if (fullname_queue->count > 0) {
 		curr = fullname_queue->deq(fullname_queue);
+	} else {
+		return;
 	}
 	while (true) {
 		mail_t *mail = create_mail(query_word, curr->mail_p->file_path);
@@ -316,13 +411,31 @@ void send_all_mail()
 		} else {
 			if (fullname_queue->count == 0) break;
 			curr = fullname_queue->deq(fullname_queue);
-			printf("mail: %s, %s\n", curr->mail_p->data.query_word,
-			       curr->mail_p->file_path);
+			// printf("mail: %s, %s\n", curr->mail_p->data.query_word,
+			// curr->mail_p->file_path);
 		}
 		FREE(mail);
 		close(sysfs_fd);
 	}
 }
+
+// void handler(int signum)
+// {
+//     if (signum == SIGUSR1) {
+//         slave_count_done++;
+//         if (slave_count_done == num_slave) {
+//             all_slave_count_done = true;
+//         }
+//         printf("Received SIGUSR1!\n");
+//     }
+//     if (signum == SIGUSR2) {
+//         slave_send_done++;
+//         if (slave_send_done == num_slave) {
+//             all_slave_send_done = true;
+//         }
+//         printf("Received SIGUSR2!\n");
+//     }
+// }
 
 void test_queue()
 {
