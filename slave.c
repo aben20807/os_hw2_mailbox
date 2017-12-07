@@ -4,27 +4,6 @@ int main(int argc, char **argv)
 {
 	printf("slave start...\n\n");
 
-	// mail_t *m1 = create_mail_master("apple", "/home/user/col5/os/test_set/a.txt");
-	// char *q_w, *f_p;
-	// extract_mail(m1, &q_w, &f_p);
-	// printf("from m: %s\n%s\n", q_w, f_p);
-	// // printf("%d", word_count(q_w, f_p));
-	// m1 = create_mail(word_count(q_w, f_p), f_p);
-	// printf("from s: %d\n%s\n", m1->data.word_count, m1->file_path);
-
-	// int sysfs_fd = open("/sys/kernel/hw2/mailbox", O_RDONLY);
-	// mail_t *mail = NULL;
-	// CALLOC(mail, sizeof(*mail), 1);
-	// while (receive_from_fd(sysfs_fd, mail) != ERR_EMPTY) {
-	//     // printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
-	//     char *q_w, *f_p;
-	//     extract_mail(mail, &q_w, &f_p);
-	//     printf("from m: \n%s\n%s\n", q_w, f_p);
-	//     printf("count: %d\n\n", word_count(q_w, f_p));
-	// }
-	// close(sysfs_fd);
-
-	// int i = 0;
 	mail_t *mail = NULL;
 	while (true) {
 		CALLOC(mail, sizeof(*mail), 1);
@@ -33,12 +12,13 @@ int main(int argc, char **argv)
 			// printf("mail: %s, %s\n", mail->data.query_word, mail->file_path);
 			char *q_w, *f_p;
 			extract_mail(mail, &q_w, &f_p);
-			printf("from m: \n%s\n%s\n", q_w, f_p);
+			// printf("from m: \n%s\n%s\n", q_w, f_p);
 			printf("count: %d\n\n", word_count(q_w, f_p));
 		}
 		close(sysfs_fd);
 		FREE(mail);
 	}
+
 	printf("\nslave finished\n\n");
 }
 
