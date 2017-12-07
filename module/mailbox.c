@@ -26,6 +26,11 @@ static ssize_t mailbox_read(struct kobject *kobj,
 {
 	struct list_head *iter = NULL;
 	mailbox_entry_t *curr = NULL;
+	if (m_head == NULL) {
+		m_head = kmalloc(sizeof(struct mailbox_head_t), GFP_KERNEL);
+		INIT_LIST_HEAD(&m_head->head);
+		m_head->count = 0;
+	}
 	// printk("call mailbox_read\n");
 	if (m_head->count == 0) {
 		// printk("ERR_EMPTY: %d\n", ERR_EMPTY);
@@ -54,9 +59,9 @@ static ssize_t mailbox_read(struct kobject *kobj,
 static ssize_t mailbox_write(struct kobject *kobj,
                              struct kobj_attribute *attr, const char *buf, size_t count)
 {
-	mail_t *mail;
-	struct list_head *iter;
-	mailbox_entry_t *curr;
+	mail_t *mail = NULL;
+	struct list_head *iter = NULL;
+	mailbox_entry_t *curr = NULL;
 	if (m_head == NULL) {
 		m_head = kmalloc(sizeof(struct mailbox_head_t), GFP_KERNEL);
 		INIT_LIST_HEAD(&m_head->head);
