@@ -5,6 +5,8 @@ int main(int argc, char **argv)
 	printf("slave start...\n\n");
 
 	signal(SIGUSR1, handler);
+	init(&wordcount_queue);
+	master_send_done = false;
 	mail_t *mail = NULL;
 	while (true) {
 		CALLOC(mail, sizeof(*mail), 1);
@@ -14,7 +16,13 @@ int main(int argc, char **argv)
 			char *q_w, *f_p;
 			extract_mail(mail, &q_w, &f_p);
 			// printf("from m: \n%s\n%s\n", q_w, f_p);
-			printf("count: %d\n\n", word_count(q_w, f_p));
+			int w_c = word_count(q_w, f_p);
+			printf("count: %d\n\n", w_c);
+			// create_mail(w_c, f_p);
+			node *tmp = create_node(create_mail(w_c, f_p));
+			wordcount_queue->enq(wordcount_queue, tmp);
+		} else {
+			if (master_send_done) break;
 		}
 		close(sysfs_fd);
 		FREE(mail);
@@ -107,6 +115,16 @@ mail_t *create_mail(const int w_c, char *f_p)
 	return tmp;
 }
 
+node *create_node(mail_t *mail_p)
+{
+	node *tmp = NULL;
+	CALLOC(tmp, sizeof(*tmp), 1);
+	tmp->mail_p = mail_p;
+	tmp->prev = NULL;
+	tmp->next = NULL;
+	return tmp;
+}
+
 /*
  * Test as get mail from master.
  */
@@ -123,25 +141,17 @@ mail_t *create_mail_master(const char *q_w, const char *f_p)
 
 int send_to_fd(int sysfs_fd, struct mail_t *mail)
 {
-	/*
-	 * write something or nothing
-	 */
-
-	// int ret_val = write(sysfs_fd, ...);
-	// if (ret_val == ERR_FULL) {
-	//     /*
-	//      * write something or nothing
-	//      */
-	// } else {
-	//     /*
-	//      * write something or nothing
-	//      */
-	// }
-
-	/*
-	 * write something or nothing
-	 */
-	return 0;
+	// printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
+	lseek(sysfs_fd, 0, SEEK_SET);
+	int ret_val = write(sysfs_fd, mail, sizeof(*mail));
+	if (ret_val < 0) {
+		// printf("ERR_FULL\n");
+		return ERR_FULL;
+	} else {
+		printf("write mail: %s, %s\n", mail->data.query_word, mail->file_path);
+		// printf("count: %zd\n", (ssize_t)ret_val);
+		return ret_val;
+	}
 }
 
 int receive_from_fd(int sysfs_fd, struct mail_t *mail)
@@ -162,6 +172,88 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 void handler(int signum)
 {
 	if (signum == SIGUSR1) {
+		master_send_done = true;
 		printf("Received SIGUSR1!\n");
 	}
+}
+
+void init(Queue **q_ptr)
+{
+	Queue *q = NULL;
+	MALLOC(q, sizeof(Queue));
+	q->count = 0;
+	q->head = NULL;
+	q->tail = NULL;
+	q->size = size;
+	q->enq = enq;
+	q->deq = deq;
+	q->display = display;
+	*q_ptr = q;
+}
+
+int size(Queue *self)
+{
+	return self->count;
+}
+
+/*
+ * Insert a node which cantains a mail_t into queue at head.
+ */
+bool enq(Queue *self, node *item)
+{
+	if ((self == NULL) || (item == NULL)) {
+		return false;
+	}
+	if (self->size(self) == 0) {
+		self->head = item;
+		self->tail = item;
+	} else {
+		self->head->prev = item;
+		item->next = self->head;
+		self->head = item;
+	}
+	self->count++;
+	return true;
+}
+
+/*
+ * Remove a node which cantains a mail_t from queue at tail.
+ */
+node *deq(Queue *self)
+{
+	if ((self == NULL) || self->size(self) == 0) {
+		printf("0\n");
+		return NULL;
+	}
+	node *tmp = self->tail;
+	if (self->size(self) != 1) {
+		self->tail = self->tail->prev;
+		self->tail->next = NULL;
+	} else {
+		self->tail = self->head;
+		self->count = 0;
+		return tmp;
+	}
+	self->count--;
+	return tmp;
+}
+
+/*
+ * Display all nodes in queue from head to tail.
+ */
+bool display(Queue *self)
+{
+	if (self == NULL || self->size(self) == 0) {
+		return false;
+	}
+	printf("head->\n");
+	node *curr = self->head;
+	int count = 0;
+	while (curr != NULL) {
+		printf("%d:\n%s\n%s\n", count++, curr->mail_p->data.query_word,
+		       curr->mail_p->file_path);
+		curr = curr->next;
+	}
+	printf("<-tail\n");
+	return true;
 }
