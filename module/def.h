@@ -8,6 +8,7 @@
 #include <linux/limits.h> // PATH_MAX
 #include <fcntl.h> // open
 #include <unistd.h> // lseek, execl
+#include <signal.h> // kill
 
 #define ERR_EMPTY -1
 #define ERR_FULL -2
@@ -27,5 +28,32 @@
     p = NULL;
 
 typedef struct mail_t mail_t;
+
+/*
+ * Queue
+ * Be used to store all full fullname under target directory.
+ */
+typedef struct node {
+	struct mail_t *mail_p;
+	struct node *prev;
+	struct node *next;
+} node;
+
+typedef struct Queue {
+	int count;
+	node *head;
+	node *tail;
+	int (*size)();
+	bool (*enq)();
+	node *(*deq)();
+	bool (*display)();
+} Queue;
+
+typedef struct element element;
+typedef element *List;
+struct element {
+	pid_t pid;
+	element *next;
+};
 
 #endif

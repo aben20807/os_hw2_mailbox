@@ -4,6 +4,7 @@ int main(int argc, char **argv)
 {
 	printf("slave start...\n\n");
 
+	signal(SIGUSR1, handler);
 	mail_t *mail = NULL;
 	while (true) {
 		CALLOC(mail, sizeof(*mail), 1);
@@ -155,5 +156,12 @@ int receive_from_fd(int sysfs_fd, struct mail_t *mail)
 	} else {
 		// printf("count: %zd\n", (ssize_t)ret_val);
 		return ret_val;
+	}
+}
+
+void handler(int signum)
+{
+	if (signum == SIGUSR1) {
+		printf("Received SIGUSR1!\n");
 	}
 }
